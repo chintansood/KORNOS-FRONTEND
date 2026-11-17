@@ -6,10 +6,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script type="module">
-  try {
-    const THREE = await import('three');
-    window.THREE = THREE;
-  } catch(e) {}
+  import('three').then(mod => { window.THREE = mod; }).catch(() => {});
 </script>
 <style>
 :root{--par:#F2E9DA;--ivo:#F8F3E9;--sand:#DCCAB0;--terra:#B96D50;--cop:#A86F45;--esp:#30251F;--char:#433A32;--olive:#7B8062;--rose:#C58B7A;--gold:#C69A55;--ink:#30251F;--bg:#F2E9DA;--card:#F8F3E9;--line:#DCCAB0;
