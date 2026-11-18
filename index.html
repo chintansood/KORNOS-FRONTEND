@@ -390,25 +390,34 @@ input{flex:1;min-width:0}
 .chat .in{display:flex;gap:6px;align-items:center;position:relative;z-index:12}
 .chat input#q{
   background:#FFFFFF !important;
-  color:var(--esp) !important;
-  border:1.5px solid var(--cop) !important;
+  color:#30251F !important;
+  border:2px solid var(--cop) !important;
   border-radius:8px !important;
   padding:8px 12px !important;
   font-size:13px !important;
   font-family:var(--sans) !important;
-  outline:none !important;
+  outline:2px solid transparent !important;
   position:relative !important;
-  z-index:20 !important;
+  z-index:100 !important;
   pointer-events:auto !important;
   -moz-user-select:text !important;
        user-select:text !important;
   -webkit-user-select:text !important;
   cursor:text !important;
-  box-shadow:inset 0 1px 3px rgba(0,0,0,0.06) !important;
+  box-shadow:0 1px 4px rgba(48,37,31,0.08) !important;
+  width:100% !important;
+  min-width:120px !important;
 }
 .chat input#q:focus{
   border-color:var(--terra) !important;
-  box-shadow:0 0 0 3px rgba(185,109,80,0.25), inset 0 1px 2px rgba(0,0,0,0.05) !important;
+  outline:2px solid var(--terra) !important;
+  box-shadow:0 0 0 4px rgba(185,109,80,0.3) !important;
+}
+body[data-v="p"] .copilot-btn {
+  bottom: 12px !important;
+  right: 18px !important;
+  transform: scale(0.92);
+  z-index: 1000 !important;
 }
 .chat button#send{
   position:relative;
@@ -1658,7 +1667,7 @@ function profV(el,id){const P=PERS.find(p=>p.id==(id||"P-0427"))||PERS[0];
 <section class="tl" aria-label="Timeline"><div class="tlh"><div><h3>TEMPORAL ACTIVITY</h3><div class="mono" style="opacity:.7">Scroll through recorded activity</div></div><div class="ctl"><select id="ft" aria-label="Filter"><option>All</option>${["FIR","Comm","Loc","Fin","Cross"].map(t=>`<option>${t}</option>`).join("")}</select><span class="mono" style="color:var(--olive)">LIVE DEMO</span></div></div>
 <div class="ctl" style="margin-top:6px"><button id="rp">▶ REPLAY INVESTIGATION</button><button id="pv" title="Previous">⏮</button><button id="nx" title="Next">⏭</button><button id="rs" title="Reset">↺</button><select id="sp" aria-label="Speed"><option value="1600">1×</option><option value="800">2×</option><option value="400">4×</option></select></div>
 <div class="scroll" id="sc"></div>
-<div class="chat" id="chat"><div class="log" id="log" aria-live="polite"></div><div class="in"><span class="ai">◎ KRONOS</span><select id="md" aria-label="Mode"><option value="A">ASSISTANCE</option><option value="D">DETECTIVE</option></select><input type="text" id="q" autocomplete="off" placeholder="Ask about ${P.id}… (or type 'open devices', 'summary')" aria-label="Ask"><button class="go" style="margin:0;padding:7px 12px" id="send">Send</button><button id="tg" title="Expand" style="border:0;background:none">⌃</button><button id="clr" title="Clear" style="border:0;background:none">✕</button></div>
+<div class="chat" id="chat"><div class="log" id="log" aria-live="polite"></div><div class="in"><span class="ai">◎ KRONOS</span><select id="md" aria-label="Mode"><option value="A">ASSISTANCE</option><option value="D">DETECTIVE</option></select><input type="text" id="q" tabindex="0" autocomplete="off" style="pointer-events:auto!important;cursor:text!important;-webkit-user-select:text!important;user-select:text!important;background:#fff!important;color:#30251F!important;position:relative!important;z-index:100!important" placeholder="Type here: ask about ${P.id}, or 'open devices', 'accounts'…" aria-label="Ask"><button class="go" style="margin:0;padding:7px 12px" id="send">Send</button><button id="tg" title="Expand" style="border:0;background:none">⌃</button><button id="clr" title="Clear" style="border:0;background:none">✕</button></div>
 <div class="mono" id="scope" style="margin-top:4px"></div><div class="sug" id="sug"></div></div></section></div>`;
  const vis=()=>mine.filter(e=>flt=="All"||e.ty==flt);
  function drawT(){$("#sc").innerHTML=vis().map(e=>`<div class="ev t-${e.ty}" id="${e.id}" tabindex="0" data-e="${e.id}"><span class="mp">${new Date(e.d+"T00:00").toLocaleDateString("en-GB",{month:"short"}).toUpperCase()}</span><div><b>${fd(e.d)} · ${e.k}</b><div class="mono">${e.c} · ${e.tm} · ${e.id}</div></div></div>`).join("")+(vis().length?'<div class="mono hint">↓ SCROLL TO EXPLORE MORE EVENTS ↓</div>':"<p>No events for this filter.</p>");
@@ -1731,7 +1740,23 @@ function profV(el,id){const P=PERS.find(p=>p.id==(id||"P-0427"))||PERS[0];
   hist.push({r:"a",t:"…"});drawChat();
   setTimeout(()=>{try{hist[hist.length-1].t=answer(q,chatMode)}catch(e){hist[hist.length-1].t="Something went wrong answering that. Please rephrase."}
    localStorage.setItem(key,JSON.stringify(hist.slice(-20)));drawChat()},500)}
- $("#send").onclick=()=>ask($("#q").value);$("#q").onkeydown=e=>e.key=="Enter"&&ask($("#q").value);
+ const qIn = $("#q");
+  if (qIn) {
+    qIn.onmousedown = (e) => { e.stopPropagation(); qIn.focus(); };
+    qIn.onclick = (e) => { e.stopPropagation(); qIn.focus(); };
+    qIn.onpointerdown = (e) => { e.stopPropagation(); qIn.focus(); };
+    qIn.onkeydown = (e) => {
+      e.stopPropagation();
+      if (e.key === "Enter") {
+        e.preventDefault();
+        ask(qIn.value);
+      }
+    };
+  }
+  $("#send").onclick = (e) => {
+    e.stopPropagation();
+    ask($("#q").value);
+  };
  $("#md").onchange=e=>{chatMode=e.target.value;hist.push({r:"a",t:`<div class="lab">${chatMode=="A"?"ASSISTANCE: facts only":"DETECTIVE: DEMO ANALYSIS"}</div>Mode switched.`});drawChat()};
  $("#tg").onclick=()=>$("#chat").classList.toggle("open");$("#clr").onclick=()=>{hist=[];localStorage.removeItem(key);drawChat()};
  drawChat()}
