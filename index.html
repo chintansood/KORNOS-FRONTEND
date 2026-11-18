@@ -18,7 +18,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14p
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--terra);outline-offset:2px}
 .mono{font-family:var(--mono);font-size:11px;letter-spacing:.04em}
-nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:14px 28px;background:linear-gradient(var(--bg),transparent)}
+nav{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:14px 28px;background:rgba(242,233,218,0.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(198,154,85,0.3);box-shadow:0 2px 12px rgba(48,37,31,0.06)}
 nav .links{display:flex;gap:26px;font-size:12px;letter-spacing:.14em}
 nav a{color:inherit;text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent}nav a:hover,nav a.on{border-color:var(--terra)}
 .demo{border:1px solid var(--cop);border-radius:99px;padding:5px 12px;font-size:11px;letter-spacing:.1em}
@@ -825,7 +825,7 @@ body[data-v="p"] .copilot-btn {
 }
 </style></head>
 <body>
-<nav><span class="wm">KRONOS</span><div class="links"><a href="#home" data-n="home">HOME</a><a href="#dash" data-n="dash">INVESTIGATIONS</a><a href="#p/P-JS01" data-n="p">INTELLIGENCE</a><a href="#graph" data-n="graph">NETWORK GRAPH</a><a href="#dash">EVIDENCE</a><a href="#p/P-JS01">TIMELINE</a></div><div class="rt"><span class="demo" style="background:rgba(185,109,80,0.15);color:var(--terra);border-color:rgba(185,109,80,0.3)">CASE DEMO • KRONOS-2024-001</span><button class="ib" id="bell" aria-label="Notifications">&#128276;</button><button class="ib av" id="av" aria-label="Profile and settings">&#9679;</button></div></nav>
+<nav><span class="wm">KRONOS</span><div class="links"><a href="#home" data-n="home">HOME</a><a href="#dash" data-n="dash">INVESTIGATIONS</a><a href="#p/P-JS01" data-n="p">INTELLIGENCE</a><a href="#graph" data-n="graph">NETWORK GRAPH</a><a href="#case/KRONOS-2024-001" data-n="case">EVIDENCE</a><a href="#p/P-JS01">TIMELINE</a></div><div class="rt"><a href="#case/KRONOS-2024-001" class="demo" style="background:rgba(185,109,80,0.15);color:var(--terra);border-color:rgba(185,109,80,0.3);text-decoration:none;cursor:pointer">CASE DEMO • KRONOS-2024-001</a><button class="ib" id="bell" aria-label="Notifications">&#128276;</button><button class="ib av" id="av" aria-label="Profile and settings">&#9679;</button></div></nav>
 <div id="app"></div><aside class="dr" id="dr" aria-label="Evidence"></aside>
 
 <!-- KRONOS UNIVERSAL INVESTIGATOR COPILOT -->
@@ -957,6 +957,57 @@ const fy=d=>new Date(d+"T00:00").toLocaleDateString("en-GB",{day:"2-digit",month
 const app=$("#app");let sel={c:null,p:null},bm=JSON.parse(localStorage.getItem("kr_bm")||"[]");
 function openDr(html){$("#dr").innerHTML=html;$("#dr").classList.add("open");document.body.classList.add("dr-open")}
 function closeDr(){$("#dr").classList.remove("open");document.body.classList.remove("dr-open")}
+
+window.openEv = function(id, scroll){
+  const e = EVT.find(x => x.id == id);
+  if(!e) { toast("Evidence record " + id + " not found"); return; }
+  document.querySelectorAll(".ev").forEach(n => {
+    const m = n.id == id || n.dataset.e == id;
+    n.classList.toggle("hl", m);
+    n.classList.toggle("active", m);
+  });
+  const n = document.getElementById(id);
+  if(n && scroll !== false) {
+    try { n.scrollIntoView({behavior:"smooth", block:"center"}); } catch(err){}
+  }
+  
+  let provBadge = '';
+  if (e.prov === 'PUBLIC_FACT') {
+    provBadge = `<div style="background:rgba(185,109,80,0.1);border:1px solid rgba(185,109,80,0.3);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:12px">
+      <div style="font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:0.5px">Category A — Publicly Documented Fact</div>
+      <div style="margin-top:4px;color:var(--ink)"><b>Issuing Authority:</b> ${e.auth || 'Official Agency Record'}</div>
+      <div style="margin-top:2px;color:var(--ink)"><b>Source / Citation:</b> ${e.cite || 'Judicial & Investigative Record'}</div>
+    </div>`;
+  } else if (e.prov === 'ILLUSTRATIVE') {
+    provBadge = `<div style="background:rgba(123,128,98,0.12);border:1px solid rgba(123,128,98,0.3);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:12px">
+      <div style="font-weight:700;color:var(--olive);text-transform:uppercase;letter-spacing:0.5px">Category B — Illustrative Reconstructed Data</div>
+      <div style="margin-top:4px;color:var(--ink);font-weight:600">ILLUSTRATIVE — NOT AN AUTHENTIC CASE RECORD</div>
+      <div style="margin-top:2px;font-size:11px;color:var(--ink)">Anonymized entity model representing investigative workflow patterns.</div>
+    </div>`;
+  } else if (e.prov === 'HYPOTHESIS') {
+    provBadge = `<div style="background:rgba(198,154,85,0.15);border:1px solid rgba(198,154,85,0.4);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:12px">
+      <div style="font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.5px">Category C — Analytical Hypothesis</div>
+      <div style="margin-top:4px;color:var(--ink);font-weight:600">ILLUSTRATIVE ANALYTICAL HYPOTHESIS — REQUIRES INVESTIGATOR VERIFICATION</div>
+      <div style="margin-top:2px;font-size:11px;color:var(--ink)">Flagged by KRONOS Detective Engine • Confidence: ${e.rel || 'High'} Priority</div>
+    </div>`;
+  }
+  
+  openDr(`<button onclick="closeDr()" style="padding:6px 12px;font-size:12px;cursor:pointer;border-radius:4px;border:1px solid var(--cop);background:#fff">Close ✕</button>
+    <h3 style="font-family:var(--serif);font-size:26px;margin:14px 0 4px">${e.id}</h3>
+    <div class="mono" style="font-size:11px">RECORD ${e.id.replace("EV","REC")} · ${e.c} · ${(e.p||[]).join(', ')}</div>
+    ${provBadge}
+    <p style="margin-top:10px"><b>${e.k}</b><br><span style="opacity:0.8">${fy(e.d)} at ${e.tm}</span></p>
+    <p style="line-height:1.6;font-size:13px">${e.s}</p>
+    <div style="display:flex;gap:14px;margin-top:14px;font-size:11px;border-top:1px solid rgba(198,154,85,0.2);padding-top:10px" class="mono">
+      <span>Modality: <b>${e.ty}</b></span>
+      <span>Source Reliability: <b>${e.rel}</b></span>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="go" style="margin:0;padding:6px 14px;font-size:11px;cursor:pointer" onclick="closeDr();location.hash='#case/${e.c}'">View in Case Workspace →</button>
+    </div>`);
+};
+function openEv(id, scroll){ return window.openEv(id, scroll); }
+
 function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.append(t);setTimeout(()=>t.remove(),1800)}
 function route(){const h=location.hash.slice(1)||"home";const [v,a]=h.split("/");
  $$("nav a").forEach(x=>x.classList.toggle("on",x.dataset.n===v));closeDr();
@@ -1219,10 +1270,10 @@ function dashV(el){el.innerHTML=`<div class="dash"><div class="metrics" id="mx">
  function draw(){const q=$("#cq").value.toLowerCase(),f=$("#cf").value,s=$("#cs").value;
   let cs=CASES.filter(c=>(c.id+c.t+c.cat).toLowerCase().includes(q)&&(!f||c.st==f)).sort((a,b)=>s=="ev"?b.ev-a.ev:s=="id"?a.id.localeCompare(b.id):b.act.localeCompare(a.act));
   const rp=sel.c?CASES.find(c=>c.id==sel.c).ppl:[],rc=sel.p?pc({id:sel.p}).map(c=>c.id):[];
-  $("#cl").innerHTML=cs.map(c=>`<button class="row ${sel.c==c.id?'sel':rc.includes(c.id)?'rel':sel.p||sel.c?'dim':''}" data-c="${c.id}"><span class="id">${c.id}</span> <span class="tag">${c.pr}</span><span class="tag">${c.st}</span><b> ${c.t}</b><small>${c.cat} · ${c.ppl.length} people · ${c.ev} evidence · last ${fd(c.act)}</small></button>`).join("")||"<p>No cases match.</p>";
+  $("#cl").innerHTML=cs.map(c=>`<button class="row ${sel.c==c.id?'sel':rc.includes(c.id)?'rel':sel.p||sel.c?'dim':''}" data-c="${c.id}"><span class="id">${c.id}</span> <span class="tag">${c.pr}</span><span class="tag">${c.st}</span><b> ${c.t}</b><small>${c.cat} · ${c.ppl.length} people · ${c.ev} evidence · last ${fd(c.act)}</small><div style="margin-top:4px"><span class="go" style="display:inline-block;padding:2px 8px;font-size:10px;border-radius:4px" onclick="event.stopPropagation();location.hash='#case/${c.id}'">Open Workspace →</span></div></button>`).join("")||"<p>No cases match.</p>";
   const pq=$("#pq").value.toLowerCase(),pf=$("#pf").value;
   let ps=PERS.filter(p=>(p.id+p.n).toLowerCase().includes(pq)&&(!pf||(pf=="m"?CASES.some(c=>c.prim.includes(p.id)):pc(p).length>=3))).sort((a,b)=>$("#ps").value=="id"?a.id.localeCompare(b.id):pc(b).length-pc(a).length);
-  $("#pl").innerHTML=ps.map(p=>`<button class="row ${sel.p==p.id?'sel':rp.includes(p.id)?'rel':sel.p||sel.c?'dim':''}" data-p="${p.id}"><span class="id">${p.id}</span> <b>${p.n}</b><small>Mentioned in ${pc(p).length} · primary in ${CASES.filter(c=>c.prim.includes(p.id)).length} · first ${fd(p.first)} · latest ${fd(p.last)}</small></button>`).join("")||"<p>No persons match.</p>";
+  $("#pl").innerHTML=ps.map(p=>`<button class="row ${sel.p==p.id?'sel':rp.includes(p.id)?'rel':sel.p||sel.c?'dim':''}" data-p="${p.id}"><span class="id">${p.id}</span> <b>${p.n}</b><small>Mentioned in ${pc(p).length} · primary in ${CASES.filter(c=>c.prim.includes(p.id)).length} · first ${fd(p.first)} · latest ${fd(p.last)}</small><div style="margin-top:4px"><span class="go" style="display:inline-block;padding:2px 8px;font-size:10px;border-radius:4px" onclick="event.stopPropagation();location.hash='#p/${p.id}'">Open Dossier →</span></div></button>`).join("")||"<p>No persons match.</p>";
   $("#gc").hidden=!sel.c;$("#gc").textContent=sel.c?`OPEN ${sel.c} WORKSPACE →`:"";$("#gp").hidden=!sel.p;$("#gp").textContent=sel.p?`OPEN PROFILE ${sel.p} →`:"";
   $$("[data-c]",el).forEach(b=>b.onclick=()=>{sel={c:sel.c==b.dataset.c?null:b.dataset.c,p:null};draw();pulse()});
   $$("[data-p]",el).forEach(b=>b.onclick=()=>{sel={p:sel.p==b.dataset.p?null:b.dataset.p,c:null};draw();pulse()})}
@@ -1578,24 +1629,36 @@ function caseV(el, caseId){
   const catB = caseEvents.filter(e => e.prov === 'ILLUSTRATIVE');
   const catC = caseEvents.filter(e => e.prov === 'HYPOTHESIS');
 
-  let activeTab = "summary";
-  let curEvFilter = "ALL";
+  let activeTab = window._kr_cur_tab || "summary";
+  let curEvFilter = window._kr_cur_flt || "ALL";
+
+  window.setCaseTab = function(t) {
+    activeTab = t;
+    window._kr_cur_tab = t;
+    render();
+  };
+
+  window.setCaseFilter = function(f) {
+    curEvFilter = f;
+    window._kr_cur_flt = f;
+    render();
+  };
 
   function render(){
     el.innerHTML = `
-    <div style="max-width:1280px;margin:0 auto;padding:24px 20px 80px">
+    <div style="max-width:1280px;margin:0 auto;padding:16px 20px 80px">
       <!-- Header Navigation & Provenance Notice -->
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <button class="go" style="margin:0;padding:6px 14px;font-size:12px" onclick="location.hash='dash'">← Back to Investigations</button>
-        <div style="display:flex;gap:8px">
-          <button class="go" style="margin:0;padding:6px 14px;font-size:12px" onclick="location.hash='p/P-JS01'">Inspect Jaffer Sadiq Dossier →</button>
-          <button class="go" style="margin:0;padding:6px 14px;font-size:12px" onclick="location.hash='graph'">View 3D Network Topology →</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <button class="go" style="margin:0;padding:7px 16px;font-size:12px;cursor:pointer" onclick="location.hash='#dash'">← Back to Investigations</button>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="go" style="margin:0;padding:7px 16px;font-size:12px;cursor:pointer" onclick="location.hash='#p/P-JS01'">Inspect Jaffer Sadiq Dossier →</button>
+          <button class="go" style="margin:0;padding:7px 16px;font-size:12px;cursor:pointer" onclick="location.hash='#graph'">View 3D Network Topology →</button>
         </div>
       </div>
 
       <!-- Case Banner Card -->
       <div style="background:var(--parchment);border:1px solid rgba(198,154,85,0.4);border-radius:10px;padding:24px 28px;box-shadow:0 4px 16px rgba(48,37,31,0.04)">
-        <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
           <span style="background:var(--terra);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:0.6px">${curCase.id}</span>
           <span style="background:rgba(185,109,80,0.15);color:var(--terra);font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:0.6px">${curCase.pr.toUpperCase()} PRIORITY</span>
           <span style="background:rgba(123,128,98,0.15);color:var(--olive);font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:0.6px">${curCase.st.toUpperCase()}</span>
@@ -1621,10 +1684,10 @@ function caseV(el, caseId){
       </div>
 
       <!-- Navigation Tabs -->
-      <div style="display:flex;gap:12px;margin:24px 0 16px;border-bottom:1px solid rgba(198,154,85,0.3);padding-bottom:8px">
-        <button id="tab-sum" class="tab-btn ${activeTab==='summary'?'active':''}" style="background:none;border:none;font-family:var(--serif);font-size:16px;font-weight:700;cursor:pointer;color:${activeTab==='summary'?'var(--terra)':'var(--ink)'};border-bottom:${activeTab==='summary'?'2px solid var(--terra)':'none'};padding:6px 12px">1. Investigation Summary & Chronology</button>
-        <button id="tab-nbe" class="tab-btn ${activeTab==='nbe'?'active':''}" style="background:none;border:none;font-family:var(--serif);font-size:16px;font-weight:700;cursor:pointer;color:${activeTab==='nbe'?'var(--terra)':'var(--ink)'};border-bottom:${activeTab==='nbe'?'2px solid var(--terra)':'none'};padding:6px 12px">2. Next Best Evidence & Hypotheses (AI Engine)</button>
-        <button id="tab-ev" class="tab-btn ${activeTab==='evidence'?'active':''}" style="background:none;border:none;font-family:var(--serif);font-size:16px;font-weight:700;cursor:pointer;color:${activeTab==='evidence'?'var(--terra)':'var(--ink)'};border-bottom:${activeTab==='evidence'?'2px solid var(--terra)':'none'};padding:6px 12px">3. Evidence Records & Provenance Ledger (${caseEvents.length})</button>
+      <div style="display:flex;gap:16px;margin:24px 0 16px;border-bottom:1px solid rgba(198,154,85,0.3);padding-bottom:0;flex-wrap:wrap">
+        <button type="button" onclick="window.setCaseTab('summary')" style="background:none;border:none;font-family:var(--serif);font-size:16px;font-weight:700;cursor:pointer;color:${activeTab==='summary'?'var(--terra)':'var(--ink)'};border-bottom:${activeTab==='summary'?'3px solid var(--terra)':'3px solid transparent'};padding:8px 14px;transition:all .2s ease">1. Investigation Summary & Chronology</button>
+        <button type="button" onclick="window.setCaseTab('nbe')" style="background:none;border:none;font-family:var(--serif);font-size:16px;font-weight:700;cursor:pointer;color:${activeTab==='nbe'?'var(--terra)':'var(--ink)'};border-bottom:${activeTab==='nbe'?'3px solid var(--terra)':'3px solid transparent'};padding:8px 14px;transition:all .2s ease">2. Next Best Evidence & Hypotheses (AI Engine)</button>
+        <button type="button" onclick="window.setCaseTab('evidence')" style="background:none;border:none;font-family:var(--serif);font-size:16px;font-weight:700;cursor:pointer;color:${activeTab==='evidence'?'var(--terra)':'var(--ink)'};border-bottom:${activeTab==='evidence'?'3px solid var(--terra)':'3px solid transparent'};padding:8px 14px;transition:all .2s ease">3. Evidence Records & Provenance Ledger (${caseEvents.length})</button>
       </div>
 
       <!-- Tab 1: Investigation Summary -->
@@ -1696,7 +1759,7 @@ function caseV(el, caseId){
                 <b>Supporting Records:</b> EV-2001 (Chennai 2015), EV-2002 (Mumbai 2019), EV-2007 (Delhi 2024 50kg Seizure).<br>
                 <b>Recommended Verification Action:</b> Subpoena historical GST invoice ledgers and master airway bills (MAWBs) from Chennai Air Cargo for comparison with West Delhi freight booking agent credentials.
               </p>
-              <button class="go" style="margin-top:6px;padding:4px 12px;font-size:11px" onclick="openEv('EV-2001')">Examine 2015 Predicate Record (EV-2001) →</button>
+              <button class="go" type="button" style="margin-top:6px;padding:6px 14px;font-size:11px;cursor:pointer" onclick="openEv('EV-2001')">Examine 2015 Predicate Record (EV-2001) →</button>
             </div>
 
             <!-- Hypothesis 2 -->
@@ -1713,7 +1776,7 @@ function caseV(el, caseId){
                 <b>Supporting Records:</b> EV-2004 (Inward Remittance), EV-2010 (JSM Pictures Sweep), EV-2013 (₹55.30 Cr Asset Attachment).<br>
                 <b>Recommended Verification Action:</b> Issue formal requests through Mutual Legal Assistance Treaties (MLAT) to Australian and NZ financial intelligence units for counterpart remitter identities.
               </p>
-              <button class="go" style="margin-top:6px;padding:4px 12px;font-size:11px" onclick="openEv('EV-2013')">Examine Asset Attachment Record (EV-2013) →</button>
+              <button class="go" type="button" style="margin-top:6px;padding:6px 14px;font-size:11px;cursor:pointer" onclick="openEv('EV-2013')">Examine Asset Attachment Record (EV-2013) →</button>
             </div>
 
             <!-- Hypothesis 3 -->
@@ -1730,7 +1793,7 @@ function caseV(el, caseId){
                 <b>Forensic Implication:</b> Evidence of parallel operational coordinators operating under synchronized communication protocol or cloned SIM hardware.<br>
                 <b>Recommended Verification Action:</b> Correlate CDR IMEI handshakes with airport boarding manifests and biometric immigration scans.
               </p>
-              <button class="go" style="margin-top:6px;padding:4px 12px;font-size:11px" onclick="openEv('EV-2006')">Examine Cell Tower Record (EV-2006) →</button>
+              <button class="go" type="button" style="margin-top:6px;padding:6px 14px;font-size:11px;cursor:pointer" onclick="openEv('EV-2006')">Examine Cell Tower Record (EV-2006) →</button>
             </div>
           </div>
         </div>
@@ -1743,21 +1806,21 @@ function caseV(el, caseId){
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
           <div>
             <h3 style="font-family:var(--serif);font-size:22px;color:var(--terra);margin:0">Case Evidence & Provenance Ledger</h3>
-            <div class="mono" style="font-size:11px;opacity:0.8">Click any record to inspect judicial citations and forensic metadata</div>
+            <div class="mono" style="font-size:11px;opacity:0.8;margin-top:2px">Click any record to inspect judicial citations and forensic metadata</div>
           </div>
-          <div style="display:flex;gap:8px">
-            <button class="go ev-flt-btn ${curEvFilter==='ALL'?'active':''}" style="margin:0;padding:4px 10px;font-size:11px" id="ef-all">All (${caseEvents.length})</button>
-            <button class="go ev-flt-btn ${curEvFilter==='PUBLIC_FACT'?'active':''}" style="margin:0;padding:4px 10px;font-size:11px" id="ef-pub">Cat A: Public Facts (${catA.length})</button>
-            <button class="go ev-flt-btn ${curEvFilter==='ILLUSTRATIVE'?'active':''}" style="margin:0;padding:4px 10px;font-size:11px" id="ef-ill">Cat B: Illustrative (${catB.length})</button>
-            <button class="go ev-flt-btn ${curEvFilter==='HYPOTHESIS'?'active':''}" style="margin:0;padding:4px 10px;font-size:11px" id="ef-hyp">Cat C: Hypotheses (${catC.length})</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button type="button" onclick="window.setCaseFilter('ALL')" style="margin:0;padding:6px 12px;font-size:11px;cursor:pointer;border-radius:99px;font-weight:${curEvFilter==='ALL'?'700':'400'};background:${curEvFilter==='ALL'?'var(--terra)':'#fff'};color:${curEvFilter==='ALL'?'#fff':'var(--ink)'};border:1px solid ${curEvFilter==='ALL'?'var(--terra)':'rgba(198,154,85,0.4)'};box-shadow:${curEvFilter==='ALL'?'0 2px 6px rgba(185,109,80,0.25)':'none'}">All (${caseEvents.length})</button>
+            <button type="button" onclick="window.setCaseFilter('PUBLIC_FACT')" style="margin:0;padding:6px 12px;font-size:11px;cursor:pointer;border-radius:99px;font-weight:${curEvFilter==='PUBLIC_FACT'?'700':'400'};background:${curEvFilter==='PUBLIC_FACT'?'var(--terra)':'#fff'};color:${curEvFilter==='PUBLIC_FACT'?'#fff':'var(--ink)'};border:1px solid ${curEvFilter==='PUBLIC_FACT'?'var(--terra)':'rgba(198,154,85,0.4)'};box-shadow:${curEvFilter==='PUBLIC_FACT'?'0 2px 6px rgba(185,109,80,0.25)':'none'}">Cat A: Public Facts (${catA.length})</button>
+            <button type="button" onclick="window.setCaseFilter('ILLUSTRATIVE')" style="margin:0;padding:6px 12px;font-size:11px;cursor:pointer;border-radius:99px;font-weight:${curEvFilter==='ILLUSTRATIVE'?'700':'400'};background:${curEvFilter==='ILLUSTRATIVE'?'var(--olive)':'#fff'};color:${curEvFilter==='ILLUSTRATIVE'?'#fff':'var(--ink)'};border:1px solid ${curEvFilter==='ILLUSTRATIVE'?'var(--olive)':'rgba(198,154,85,0.4)'};box-shadow:${curEvFilter==='ILLUSTRATIVE'?'0 2px 6px rgba(123,128,98,0.25)':'none'}">Cat B: Illustrative (${catB.length})</button>
+            <button type="button" onclick="window.setCaseFilter('HYPOTHESIS')" style="margin:0;padding:6px 12px;font-size:11px;cursor:pointer;border-radius:99px;font-weight:${curEvFilter==='HYPOTHESIS'?'700':'400'};background:${curEvFilter==='HYPOTHESIS'?'var(--gold)':'#fff'};color:${curEvFilter==='HYPOTHESIS'?'#fff':'var(--ink)'};border:1px solid ${curEvFilter==='HYPOTHESIS'?'var(--gold)':'rgba(198,154,85,0.4)'};box-shadow:${curEvFilter==='HYPOTHESIS'?'0 2px 6px rgba(198,154,85,0.25)':'none'}">Cat C: Hypotheses (${catC.length})</button>
           </div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr;gap:10px">
           ${caseEvents.filter(e => curEvFilter === 'ALL' || e.prov === curEvFilter).map(e => `
-            <div class="ev-row" style="background:var(--parchment);border:1px solid rgba(198,154,85,0.3);border-radius:6px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="openEv('${e.id}')">
+            <div class="ev-row" style="background:var(--parchment);border:1px solid rgba(198,154,85,0.3);border-radius:6px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease" onclick="openEv('${e.id}')">
               <div style="max-width:80%">
-                <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;flex-wrap:wrap">
                   <span class="mono" style="font-weight:700;font-size:11px;color:var(--terra)">${e.id}</span>
                   <span style="font-size:10px;padding:2px 6px;border-radius:3px;background:${e.prov==='PUBLIC_FACT'?'rgba(185,109,80,0.15)':e.prov==='ILLUSTRATIVE'?'rgba(123,128,98,0.15)':'rgba(198,154,85,0.2)'};color:${e.prov==='PUBLIC_FACT'?'var(--terra)':e.prov==='ILLUSTRATIVE'?'var(--olive)':'var(--gold)'};font-weight:700">
                     ${e.prov==='PUBLIC_FACT'?'CATEGORY A: PUBLIC FACT':e.prov==='ILLUSTRATIVE'?'CATEGORY B: ILLUSTRATIVE':'CATEGORY C: HYPOTHESIS'}
@@ -1767,7 +1830,7 @@ function caseV(el, caseId){
                 <div style="font-weight:600;font-size:13px;color:var(--ink)">${e.k}</div>
                 <div style="font-size:12px;color:var(--ink);opacity:0.85;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.s}</div>
               </div>
-              <button class="go" style="margin:0;padding:4px 10px;font-size:11px">Inspect ↗</button>
+              <button class="go" type="button" style="margin:0;padding:6px 14px;font-size:11px;cursor:pointer" onclick="openEv('${e.id}'); event.stopPropagation();">Inspect ↗</button>
             </div>
           `).join('')}
         </div>
@@ -1776,25 +1839,6 @@ function caseV(el, caseId){
 
     </div>
     `;
-
-    // Event handlers for tab switching
-    const tabSum = document.getElementById("tab-sum");
-    const tabNbe = document.getElementById("tab-nbe");
-    const tabEv = document.getElementById("tab-ev");
-
-    if (tabSum) tabSum.onclick = () => { activeTab = "summary"; render(); };
-    if (tabNbe) tabNbe.onclick = () => { activeTab = "nbe"; render(); };
-    if (tabEv) tabEv.onclick = () => { activeTab = "evidence"; render(); };
-
-    const efAll = document.getElementById("ef-all");
-    const efPub = document.getElementById("ef-pub");
-    const efIll = document.getElementById("ef-ill");
-    const efHyp = document.getElementById("ef-hyp");
-
-    if (efAll) efAll.onclick = () => { curEvFilter = "ALL"; render(); };
-    if (efPub) efPub.onclick = () => { curEvFilter = "PUBLIC_FACT"; render(); };
-    if (efIll) efIll.onclick = () => { curEvFilter = "ILLUSTRATIVE"; render(); };
-    if (efHyp) efHyp.onclick = () => { curEvFilter = "HYPOTHESIS"; render(); };
   }
 
   render();
@@ -1875,8 +1919,23 @@ function profV(el,id){const P=PERS.find(p=>p.id==(id||"P-JS01"))||PERS[0];
   openDr(`<button onclick="closeDr()">Close ✕</button><h3 style="font-family:var(--serif);font-size:26px;margin:12px 0 0">Relationship graph</h3><div class="mono">${P.id} · cases (terracotta) and entities (olive)</div><svg viewBox="0 0 340 380" style="width:100%">${g}<circle cx="170" cy="190" r="12" fill="#30251F"/><text x="170" y="194" font-size="8" text-anchor="middle" fill="#F8F3E9">${P.id.slice(2)}</text></svg>`)};
  $("#bk").onclick=e=>{bm=bm.includes(P.id)?bm.filter(x=>x!=P.id):[...bm,P.id];localStorage.setItem("kr_bm",JSON.stringify(bm));e.target.textContent=bm.includes(P.id)?"★ Bookmarked":"☆ Bookmark";toast("Bookmarks saved locally")};
  $("#ex").onclick=()=>{const t=vis().map(e=>`${e.d} ${e.tm}\t${e.k}\t${e.c}\t${e.id}\t${e.s}`).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/plain"}));a.download=P.id+"-timeline.txt";a.click();toast("Timeline exported")};
- $$("[data-cs]",el).forEach(b=>b.onclick=()=>{const f=mine.find(e=>e.c==b.dataset.cs);f?openEv(f.id):toast("No timeline events for "+b.dataset.cs+" in demo data")});
- $$("[data-en]",el).forEach(b=>b.onclick=()=>toast("Entity: "+b.dataset.en))
+ $$("[data-cs]",el).forEach(b=>b.onclick=()=>{location.hash = "#case/" + b.dataset.cs;});
+ $$("[data-en]",el).forEach(b=>b.onclick=()=>{
+  const enName = b.dataset.en;
+  const matchEvts = EVT.filter(e => e.s.toLowerCase().includes(enName.toLowerCase()) || (e.k && e.k.toLowerCase().includes(enName.toLowerCase())));
+  openDr(`<button onclick="closeDr()" style="padding:6px 12px;font-size:12px;cursor:pointer;border-radius:4px;border:1px solid var(--cop);background:#fff">Close ✕</button>
+    <h3 style="font-family:var(--serif);font-size:24px;margin:14px 0 4px">${enName}</h3>
+    <div class="mono" style="font-size:11px;color:var(--olive);font-weight:700">CONNECTED INVESTIGATIVE ENTITY</div>
+    <p style="font-size:13px;line-height:1.5;margin-top:10px">Entity associated with <b>${P.n} (${P.id})</b> across master cartel dockets.</p>
+    <div style="margin-top:14px;border-top:1px solid rgba(198,154,85,0.2);padding-top:10px">
+      <div class="mono" style="font-size:11px;font-weight:700;margin-bottom:8px">CORRELATED CASE RECORDS (${matchEvts.length})</div>
+      ${matchEvts.map(e => `<div style="background:var(--parchment);padding:8px 10px;border-radius:4px;margin-bottom:6px;cursor:pointer" onclick="openEv('${e.id}')">
+        <div style="font-weight:700;font-size:12px">${e.k}</div>
+        <div class="mono" style="font-size:10px;opacity:0.8">${e.id} · ${fd(e.d)}</div>
+      </div>`).join('') || '<div class="mono" style="font-size:11px;opacity:0.7">No direct timeline mention; inspect in 3D topology.</div>'}
+    </div>
+    <div style="margin-top:16px"><button class="go" style="margin:0;padding:6px 14px;font-size:11px" onclick="closeDr();location.hash='#graph'">Locate in 3D Topology →</button></div>`);
+})
  /* chat */
  const SUG={A:["Summarise Jaffer Sadiq recorded activity","What is the 50.070 kg seizure evidence?","Audit ₹55.30 Cr attached assets","Madras High Court bail status","Which cases record this person as primary?"],D:["Explain temporal patterns","Any unusual travel sequence?","Suggest next best evidence leads","Predicate case links (2015 & 2019)"]};
  const L=ids=>ids.map(i=>`<button class="ev2" data-j="${i}">${i}</button>`).join("");
@@ -1930,8 +1989,43 @@ function profV(el,id){const P=PERS.find(p=>p.id==(id||"P-JS01"))||PERS[0];
  $("#md").onchange=e=>{chatMode=e.target.value;hist.push({r:"a",t:`<div class="lab">${chatMode=="A"?"ASSISTANCE: facts only":"DETECTIVE: DEMO ANALYSIS"}</div>Mode switched.`});drawChat()};
  $("#tg").onclick=()=>$("#chat").classList.toggle("open");$("#clr").onclick=()=>{hist=[];localStorage.removeItem(key);drawChat()};
  drawChat()}
-$("#bell").onclick=()=>{openDr(`<button onclick="closeDr()">Close ✕</button><h3 style="font-family:var(--serif);font-size:26px">Notifications</h3>${EVT.slice(-4).reverse().map(e=>`<p><b>${e.k}</b><br><span class="mono">${e.c} · ${e.id} · ${fy(e.d)}</span></p>`).join("")}<p class="mono">Demo notifications.</p>`)};
-$("#av").onclick=()=>{openDr(`<button onclick="closeDr()">Close ✕</button><h3 style="font-family:var(--serif);font-size:26px">Profile &amp; settings</h3><p class="mono">DEMO MODE · changes stay in this browser</p><button class="go" id="rst">Reset demo data</button>`);$("#rst").onclick=()=>{Object.keys(localStorage).filter(k=>k.startsWith("kr_")).forEach(k=>localStorage.removeItem(k));bm=[];toast("Local demo data reset");closeDr();route()}};
+window.openNotifications = function(){
+  openDr(`<button onclick="closeDr()" style="padding:6px 12px;font-size:12px;cursor:pointer;border-radius:4px;border:1px solid var(--cop);background:#fff">Close ✕</button>
+    <h3 style="font-family:var(--serif);font-size:26px;margin:14px 0 6px">Investigative Alerts</h3>
+    <div class="mono" style="font-size:11px;margin-bottom:12px">LATEST DISPATCHES · KRONOS-2024-001</div>
+    ${EVT.slice(-5).reverse().map(e=>`
+      <div style="background:var(--parchment);padding:10px 12px;border-radius:6px;margin-bottom:8px;border-left:3px solid var(--terra);cursor:pointer" onclick="openEv('${e.id}')">
+        <div style="font-weight:700;font-size:12px;color:var(--ink)">${e.k}</div>
+        <div class="mono" style="font-size:10px;opacity:0.8;margin-top:2px">${e.c} · ${e.id} · ${fy(e.d)}</div>
+        <div style="font-size:11px;color:var(--ink);opacity:0.85;margin-top:4px">${e.s.slice(0, 90)}...</div>
+      </div>
+    `).join("")}
+    <p class="mono" style="font-size:11px;opacity:0.7;margin-top:12px">All agency alerts synchronized from official court filings and seizure memos.</p>`);
+};
+if($("#bell")) $("#bell").onclick = window.openNotifications;
+window.openSettings = function(){
+  openDr(`<button onclick="closeDr()" style="padding:6px 12px;font-size:12px;cursor:pointer;border-radius:4px;border:1px solid var(--cop);background:#fff">Close ✕</button>
+    <h3 style="font-family:var(--serif);font-size:26px;margin:14px 0 6px">System &amp; Case Settings</h3>
+    <div class="mono" style="font-size:11px;color:var(--terra);font-weight:700;margin-bottom:12px">FEATURED CASE STUDY: KRONOS-2024-001</div>
+    <p style="font-size:13px;line-height:1.5">Offline Forensic Demonstration Terminal configured for the Jaffer Sadiq drug cartel and money-laundering investigation.</p>
+    <div style="margin:16px 0;border-top:1px solid rgba(198,154,85,0.2);padding-top:14px">
+      <div class="mono" style="font-size:11px;font-weight:700;margin-bottom:6px">ACTIVE LANGUAGE MODE</div>
+      <div style="display:flex;gap:6px">
+        <button class="go" style="margin:0;padding:4px 10px;font-size:11px" onclick="localStorage.setItem('kr_copilot_lang','en');toast('Language set to English');closeDr();route()">English</button>
+        <button class="go" style="margin:0;padding:4px 10px;font-size:11px" onclick="localStorage.setItem('kr_copilot_lang','hi');toast('भाषा हिंदी सेट की गई');closeDr();route()">हिंदी</button>
+        <button class="go" style="margin:0;padding:4px 10px;font-size:11px" onclick="localStorage.setItem('kr_copilot_lang','gu');toast('ભાષા ગુજરાતી સેટ થઈ');closeDr();route()">ગુજરાતી</button>
+      </div>
+    </div>
+    <div style="margin-top:18px"><button class="go" id="rst" style="background:#5A3F33;border-color:#5A3F33;padding:6px 14px;font-size:11px">Reset Local Demonstration Cache</button></div>`);
+  if($("#rst")) $("#rst").onclick = () => {
+    Object.keys(localStorage).filter(k => k.startsWith("kr_")).forEach(k => localStorage.removeItem(k));
+    bm = [];
+    toast("Local demonstration data reset");
+    closeDr();
+    route();
+  };
+};
+if($("#av")) $("#av").onclick = window.openSettings;
 route();
 
 
