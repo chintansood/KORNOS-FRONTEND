@@ -386,8 +386,35 @@ input{flex:1;min-width:0}
 .ctl{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
 .ctl button,.ctl select{padding:4px 9px;border-radius:8px;border:1px solid var(--line);background:var(--bg);font-size:12px}
 .ctl .on{background:var(--terra);color:#fff;border-color:var(--terra)}
-.chat{border:1px solid var(--cop);border-radius:12px;background:var(--ivo);padding:8px}
-.chat .log{max-height:0;overflow:auto;transition:max-height .3s}.chat.open .log{max-height:200px;margin-bottom:6px}
+.chat{border:1.5px solid var(--cop);border-radius:12px;background:var(--ivo);padding:10px;position:relative;z-index:10;box-shadow:0 4px 14px rgba(48,37,31,0.06)}
+.chat .log{max-height:0;overflow:auto;transition:max-height .3s}.chat.open .log{max-height:220px;margin-bottom:8px}
+.chat .in{display:flex;gap:6px;align-items:center;position:relative;z-index:12}
+.chat input#q{
+  background:#FFFFFF !important;
+  color:var(--esp) !important;
+  border:1.5px solid var(--cop) !important;
+  border-radius:8px !important;
+  padding:8px 12px !important;
+  font-size:13px !important;
+  font-family:var(--sans) !important;
+  outline:none !important;
+  position:relative !important;
+  z-index:20 !important;
+  pointer-events:auto !important;
+  user-select:text !important;
+  -webkit-user-select:text !important;
+  cursor:text !important;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,0.06) !important;
+}
+.chat input#q:focus{
+  border-color:var(--terra) !important;
+  box-shadow:0 0 0 3px rgba(185,109,80,0.25), inset 0 1px 2px rgba(0,0,0,0.05) !important;
+}
+.chat button#send{
+  position:relative;
+  z-index:20;
+  pointer-events:auto;
+}
 .msg{margin:6px 0;font-size:13px;line-height:1.45}.msg.u{text-align:right;color:var(--cop)}
 .msg .ev2{font-family:var(--mono);font-size:11px;border:1px solid var(--cop);background:transparent;border-radius:6px;padding:0 5px;margin:0 2px}
 .msg .lab{font-size:10px;letter-spacing:.1em;color:var(--terra)}
@@ -468,7 +495,7 @@ input{flex:1;min-width:0}
   border-radius: 18px;
   box-shadow: 0 24px 64px rgba(48, 37, 31, 0.35), 0 4px 16px rgba(0, 0, 0, 0.06);
   z-index: 1001;
-  display: flex;
+  display: none;
   flex-direction: column;
   overflow: hidden;
   opacity: 0;
@@ -477,9 +504,10 @@ input{flex:1;min-width:0}
   transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .copilot-panel.open {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0) scale(1);
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateY(0) scale(1) !important;
 }
 .copilot-panel.maximized {
   width: min(840px, calc(100vw - 32px));
@@ -1629,7 +1657,7 @@ function profV(el,id){const P=PERS.find(p=>p.id==(id||"P-0427"))||PERS[0];
 <section class="tl" aria-label="Timeline"><div class="tlh"><div><h3>TEMPORAL ACTIVITY</h3><div class="mono" style="opacity:.7">Scroll through recorded activity</div></div><div class="ctl"><select id="ft" aria-label="Filter"><option>All</option>${["FIR","Comm","Loc","Fin","Cross"].map(t=>`<option>${t}</option>`).join("")}</select><span class="mono" style="color:var(--olive)">LIVE DEMO</span></div></div>
 <div class="ctl" style="margin-top:6px"><button id="rp">▶ REPLAY INVESTIGATION</button><button id="pv" title="Previous">⏮</button><button id="nx" title="Next">⏭</button><button id="rs" title="Reset">↺</button><select id="sp" aria-label="Speed"><option value="1600">1×</option><option value="800">2×</option><option value="400">4×</option></select></div>
 <div class="scroll" id="sc"></div>
-<div class="chat" id="chat"><div class="log" id="log" aria-live="polite"></div><div class="in"><span class="ai">◎ KRONOS</span><select id="md" aria-label="Mode"><option value="A">ASSISTANCE</option><option value="D">DETECTIVE</option></select><input id="q" placeholder="Ask about ${P.id}…" aria-label="Ask"><button class="go" style="margin:0;padding:7px 12px" id="send">Send</button><button id="tg" title="Expand" style="border:0;background:none">⌃</button><button id="clr" title="Clear" style="border:0;background:none">✕</button></div>
+<div class="chat" id="chat"><div class="log" id="log" aria-live="polite"></div><div class="in"><span class="ai">◎ KRONOS</span><select id="md" aria-label="Mode"><option value="A">ASSISTANCE</option><option value="D">DETECTIVE</option></select><input type="text" id="q" autocomplete="off" placeholder="Ask about ${P.id}… (or type 'open devices', 'summary')" aria-label="Ask"><button class="go" style="margin:0;padding:7px 12px" id="send">Send</button><button id="tg" title="Expand" style="border:0;background:none">⌃</button><button id="clr" title="Clear" style="border:0;background:none">✕</button></div>
 <div class="mono" id="scope" style="margin-top:4px"></div><div class="sug" id="sug"></div></div></section></div>`;
  const vis=()=>mine.filter(e=>flt=="All"||e.ty==flt);
  function drawT(){$("#sc").innerHTML=vis().map(e=>`<div class="ev t-${e.ty}" id="${e.id}" tabindex="0" data-e="${e.id}"><span class="mp">${new Date(e.d+"T00:00").toLocaleDateString("en-GB",{month:"short"}).toUpperCase()}</span><div><b>${fd(e.d)} · ${e.k}</b><div class="mono">${e.c} · ${e.tm} · ${e.id}</div></div></div>`).join("")+(vis().length?'<div class="mono hint">↓ SCROLL TO EXPLORE MORE EVENTS ↓</div>':"<p>No events for this filter.</p>");
@@ -1675,8 +1703,27 @@ function profV(el,id){const P=PERS.find(p=>p.id==(id||"P-0427"))||PERS[0];
   else if(/comm|call|sms|message/.test(s)){let f=pool.filter(e=>e.ty=="Comm"||e.ty=="CDR");sub(f);t=f.length?`${f.length} communication / call event(s): ${f.map(e=>`${fd(e.d)} — ${e.s}`).join(" ")}`:"No communication events in scope."}
   else if(m!==undefined||/\d{1,2}\s?(jan|feb|mar)/.test(s)){let f=pool.filter(e=>new Date(e.d).getMonth()==(mon[m]??-1));sub(f);t=f.length?`Events recorded: ${f.map(e=>`${fd(e.d)} ${e.k} (${e.c})`).join("; ")}.`:"No events are present for that period in the demonstration dataset."}
   else if(/summar|activity|overview/.test(s)){sub(pool);t=`${pool.length} recorded event(s) between ${pool.length?fd(pool[0].d)+" and "+fd(pool[pool.length-1].d):"—"} across ${[...new Set(pool.map(e=>e.c))].join(", ")||"no cases"}. Types: ${[...new Set(pool.map(e=>e.k))].join(", ")}.`}
-  else t="That information is not present in the demonstration dataset. Try asking about cases, communications, financial activity, dates or entities.";
-  return `<div class="lab">RECORDED FACTS</div>${t} ${L(refs)}`}
+  else {
+    const cLang = localStorage.getItem("kr_copilot_lang") || "en";
+    if (typeof processCopilotQuery === "function") {
+      try {
+        const cRes = processCopilotQuery(q, cLang);
+        if (cRes && cRes.answerText) {
+          let thought = "";
+          if (cRes.reasoning && cRes.reasoning.length) {
+            thought = `<details open style="margin-top:6px;font-size:11px;background:rgba(185,109,80,0.08);padding:6px 10px;border-radius:6px;border:1px solid rgba(168,111,69,0.25)"><summary style="cursor:pointer;font-weight:600;color:var(--terra)">🧠 How AI Thinks (${cRes.reasoning.length} steps)</summary><ul style="margin:4px 0 0;padding-left:16px">${cRes.reasoning.map(r=>`<li>${r}</li>`).join("")}</ul></details>`;
+          }
+          let act = "";
+          if (cRes.action) {
+            act = `<div style="margin-top:6px"><button class="go" style="font-size:11px;padding:4px 10px;margin:0" onclick="location.hash='${cRes.action.target}'">→ ${cRes.action.label}</button></div>`;
+          }
+          return `<div class="lab">KRONOS INVESTIGATION INTELLIGENCE</div>${cRes.answerText}${thought}${act}`;
+        }
+      } catch(e){}
+    }
+    t = "Query parsed across suspect dossier. Try asking about cases, devices, transactions, CDR records, or type commands like 'open devices'.";
+  }
+  return `<div class="lab">RECORDED FACTS</div>${t} ${L(refs)}`};
  function drawChat(){$("#log").innerHTML=hist.map(h=>`<div class="msg ${h.r}">${h.r=="u"?h.t:h.t}</div>`).join("");$("#log").scrollTop=1e9;$("#sug").innerHTML=SUG[chatMode].map(s=>`<button>${s}</button>`).join("");
   $$("#sug button").forEach(b=>b.onclick=()=>ask(b.textContent));$$(".ev2",el).forEach(b=>b.onclick=()=>{const e=EVT.find(x=>x.id==b.dataset.j);if(flt!="All"&&e.ty!=flt){flt="All";$("#ft").value="All";drawT()}openEv(b.dataset.j)})}
  function ask(q){q=q.trim();if(!q)return;$("#chat").classList.add("open");hist.push({r:"u",t:q.replace(/</g,"&lt;")});drawChat();$("#q").value="";
