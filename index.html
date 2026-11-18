@@ -854,7 +854,7 @@ body[data-v="p"] .copilot-btn {
   </div>
 
   <div class="c-context-banner" id="c-context-banner">
-    <span id="c-context-text">📍 Active Context: Consolidated Master Engine (100 Cases)</span>
+    <span id="c-context-text">Active Context: Consolidated Master Engine (100 Cases)</span>
     <button class="c-btn-icon" id="c-clear-btn" title="Clear History" style="font-size:11px">✕ Clear</button>
   </div>
 
@@ -1811,7 +1811,7 @@ function profV(el,id){const P=PERS.find(p=>p.id==(id||"P-JS01"))||PERS[0];
 <div class="chips"><div class="mono">CONNECTED ENTITIES</div>${P.ents.map(e=>`<button data-en="${e}">${e}</button>`).join("")}</div>
 <div style="background:rgba(185,109,80,0.08);border:1px solid rgba(185,109,80,0.3);border-radius:8px;padding:12px 14px;margin-top:10px">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-    <span style="font-size:10px;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:0.6px">🔍 NEXT BEST EVIDENCE TO EXAMINE</span>
+    <span style="font-size:10px;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:0.6px">NEXT BEST EVIDENCE TO EXAMINE</span>
     <span style="background:rgba(185,109,80,0.2);color:var(--terra);font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px">HIGH PRIORITY</span>
   </div>
   <div style="font-size:12px;font-weight:600;color:var(--ink)">Audit Foreign Film Distribution Contracts for JSM Pictures</div>
@@ -1880,44 +1880,30 @@ function profV(el,id){const P=PERS.find(p=>p.id==(id||"P-JS01"))||PERS[0];
  /* chat */
  const SUG={A:["Summarise Jaffer Sadiq recorded activity","What is the 50.070 kg seizure evidence?","Audit ₹55.30 Cr attached assets","Madras High Court bail status","Which cases record this person as primary?"],D:["Explain temporal patterns","Any unusual travel sequence?","Suggest next best evidence leads","Predicate case links (2015 & 2019)"]};
  const L=ids=>ids.map(i=>`<button class="ev2" data-j="${i}">${i}</button>`).join("");
- function answer(q,mode){const s=q.toLowerCase(),v=vis(),pool=v.length?v:[];let t="",refs=[];
-  const mon={jan:0,feb:1,mar:2};const m=Object.keys(mon).find(k=>s.includes(k)||s.includes({jan:"january",feb:"february",mar:"march"}[k]));
-  const sub=a=>{refs=a.map(e=>e.id)};
-  if(mode=="D"){const loc=pool.filter(e=>e.ty=="Loc");
-   if(/travel|move|location|unusual/.test(s)){sub(loc);t=`Hypothesis: Consecutive location pings at Cantt, Ambala (07 Jan) and Sector 17, Chandigarh (13 Jan) precede the Sector 35 Civic Node check-in (07 Mar). Recorded facts: ${loc.length} location events in CASE-014 and CASE-021.`}
-   else if(/lead|suggest/.test(s)){sub(pool.filter(e=>e.ty=="Fin"||e.ty=="Cross"||e.ty=="FIR"));t="Possible leads: (1) Trace corporate escrow account HDFC-00449102 beyond the 20 Jan outbound transfer of ₹17,431.87; (2) Cross-reference vehicle REG-PB-3012 associated with P-0350 in CASE-014 & CASE-024. Alternative: transactions may reflect ordinary corporate commerce."}
-   else{sub(pool.filter(e=>e.ty=="Comm"||e.ty=="CDR"||e.ty=="Fin"));t="Pattern: Call activity via Synthetic Tower 302113 (02 Jan) and encrypted communication (03 Jan) directly precede the series of bank transfers via Synthetic Bank A. This reflects temporal correlation, not definitive intent."}
-   return `<div class="lab">DEMO ANALYSIS · HYPOTHESIS, NOT FACT</div>${t} ${L(refs)}`}
-  if(/how many cases|cross|appearance|mentioned/.test(s)){sub(pool.filter(e=>e.ty=="Cross"));t=`${P.id} is mentioned in ${cm.length} cases: ${cm.map(c=>c.id).join(", ")}. Cross-case appearance events: ${refs.length||"none"} in the current scope.`}
-  else if(/primary|suspect/.test(s)){t=pr.length?`Recorded as primary suspect in ${pr.map(c=>c.id).join(" and ")}. This reflects FIR classification only.`:"No primary-suspect classification is present in the demonstration dataset."}
-  else if(/earliest|first/.test(s)){const e=pool[0];if(e){sub([e]);t=`Earliest event in scope: ${e.k} on ${fy(e.d)} ${e.tm} (${e.c}).`}else t="No events in current scope."}
-  else if(/latest|last|recent/.test(s)){const e=pool[pool.length-1];if(e){sub([e]);t=`Latest event in scope: ${e.k} on ${fy(e.d)} (${e.c}).`}else t="No events in current scope."}
-  else if(/entit|associat|device|phone|account/.test(s)){t=`Associated entities: ${P.ents.join("; ")}.`}
-  else if(/financ|money|transaction|transfer|account/.test(s)||/financ/.test(s)){let f=pool.filter(e=>e.ty=="Fin"&&(m===undefined||new Date(e.d).getMonth()==mon[m]));sub(f);t=f.length?`${f.length} financial record(s)${m?" in "+m.toUpperCase():""}: ${f.map(e=>`${fd(e.d)} — ${e.s}`).join(" ")}`:`No financial records${m?" for "+m.toUpperCase():""} are present in the demonstration dataset.`}
-  else if(/comm|call|sms|message/.test(s)){let f=pool.filter(e=>e.ty=="Comm"||e.ty=="CDR");sub(f);t=f.length?`${f.length} communication / call event(s): ${f.map(e=>`${fd(e.d)} — ${e.s}`).join(" ")}`:"No communication events in scope."}
-  else if(m!==undefined||/\d{1,2}\s?(jan|feb|mar)/.test(s)){let f=pool.filter(e=>new Date(e.d).getMonth()==(mon[m]??-1));sub(f);t=f.length?`Events recorded: ${f.map(e=>`${fd(e.d)} ${e.k} (${e.c})`).join("; ")}.`:"No events are present for that period in the demonstration dataset."}
-  else if(/summar|activity|overview/.test(s)){sub(pool);t=`${pool.length} recorded event(s) between ${pool.length?fd(pool[0].d)+" and "+fd(pool[pool.length-1].d):"—"} across ${[...new Set(pool.map(e=>e.c))].join(", ")||"no cases"}. Types: ${[...new Set(pool.map(e=>e.k))].join(", ")}.`}
-  else {
-    const cLang = localStorage.getItem("kr_copilot_lang") || "en";
-    if (typeof processCopilotQuery === "function") {
-      try {
-        const cRes = processCopilotQuery(q, cLang);
-        if (cRes && cRes.answerText) {
-          let thought = "";
-          if (cRes.reasoning && cRes.reasoning.length) {
-            thought = `<details open style="margin-top:6px;font-size:11px;background:rgba(185,109,80,0.08);padding:6px 10px;border-radius:6px;border:1px solid rgba(168,111,69,0.25)"><summary style="cursor:pointer;font-weight:600;color:var(--terra)">🧠 How AI Thinks (${cRes.reasoning.length} steps)</summary><ul style="margin:4px 0 0;padding-left:16px">${cRes.reasoning.map(r=>`<li>${r}</li>`).join("")}</ul></details>`;
-          }
-          let act = "";
-          if (cRes.action) {
-            act = `<div style="margin-top:6px"><button class="go" style="font-size:11px;padding:4px 10px;margin:0" onclick="location.hash='${cRes.action.target}'">→ ${cRes.action.label}</button></div>`;
-          }
-          return `<div class="lab">KRONOS INVESTIGATION INTELLIGENCE</div>${cRes.answerText}${thought}${act}`;
+ function answer(q,mode){
+  const s = q.toLowerCase();
+  const cLang = localStorage.getItem("kr_copilot_lang") || "en";
+  if (typeof processCopilotQuery === "function") {
+    try {
+      const cRes = processCopilotQuery(q, cLang);
+      if (cRes && cRes.answerText) {
+        let thought = "";
+        if (cRes.reasoning && cRes.reasoning.length) {
+          const lTitle = cLang === "hi" ? "फोरेंसिक तर्क • विश्लेषणात्मक सत्यापन चरण" : cLang === "gu" ? "ફોરેન્સિક તર્ક • વિશ્લેષણાત્મક વેરિફિકેશન પગલાં" : "Forensic Reasoning • Analytical Verification Steps";
+          const sPrefix = cLang === "hi" ? "चरण" : cLang === "gu" ? "પગલું" : "Step";
+          thought = `<details open style="margin-top:8px;font-size:11px;background:rgba(185,109,80,0.08);padding:8px 12px;border-radius:6px;border:1px solid rgba(168,111,69,0.25)"><summary style="cursor:pointer;font-weight:700;color:var(--terra)">${lTitle} (${cRes.reasoning.length} ${cLang==='hi'?'चरण':cLang==='gu'?'પગલાં':'steps'})</summary><ul style="margin:6px 0 0;padding-left:16px">${cRes.reasoning.map((r,i)=>`<li><b>${sPrefix} ${i+1}:</b> ${r}</li>`).join("")}</ul></details>`;
         }
-      } catch(e){}
-    }
-    t = "Query parsed across suspect dossier. Try asking about cases, devices, transactions, CDR records, or type commands like 'open devices'.";
+        let act = "";
+        if (cRes.action) {
+          act = `<div style="margin-top:8px"><button class="go" style="font-size:11px;padding:4px 10px;margin:0" onclick="location.hash='${cRes.action.target}'">${cRes.action.label}</button></div>`;
+        }
+        const badgeTitle = cLang === "hi" ? "क्रोनोस अन्वेषण आसूचना" : cLang === "gu" ? "ક્રોનોસ તપાસ ઇન્ટેલિજન્સ" : "KRONOS INVESTIGATION INTELLIGENCE";
+        return `<div class="lab">${badgeTitle}</div>${cRes.answerText}${thought}${act}`;
+      }
+    } catch(e){}
   }
-  return `<div class="lab">RECORDED FACTS</div>${t} ${L(refs)}`};
+  return `<div class="lab">RECORDED FACTS</div>Analysis parsed across suspect dossier.`;
+};
  function drawChat(){$("#log").innerHTML=hist.map(h=>`<div class="msg ${h.r}">${h.r=="u"?h.t:h.t}</div>`).join("");$("#log").scrollTop=1e9;$("#sug").innerHTML=SUG[chatMode].map(s=>`<button>${s}</button>`).join("");
   $$("#sug button").forEach(b=>b.onclick=()=>ask(b.textContent));$$(".ev2",el).forEach(b=>b.onclick=()=>{const e=EVT.find(x=>x.id==b.dataset.j);if(flt!="All"&&e.ty!=flt){flt="All";$("#ft").value="All";drawT()}openEv(b.dataset.j)})}
  function ask(q){q=q.trim();if(!q)return;$("#chat").classList.add("open");hist.push({r:"u",t:q.replace(/</g,"&lt;")});drawChat();$("#q").value="";
@@ -1958,12 +1944,13 @@ route();
   const UI = {
     en: {
       title: "KRONOS COPILOT",
-      live: "MASTER ENGINE",
-      placeholder: "Type a command ('open Jaffer Sadiq', 'audit seizure', 'filter CDR') or ask anything...",
-      thinking: "🧠 How AI Thinks • Forensic Reasoning",
-      actionReady: "⚡ Ready to Execute:",
-      actionDone: "✓ Step Completed:",
-      execBtn: "Run Step",
+      live: "FORENSIC ENGINE",
+      placeholder: "Type an investigative query or select analysis below...",
+      thinking: "Forensic Reasoning • Analytical Verification Steps",
+      actionReady: "Action Dispatch:",
+      actionDone: "Execution Completed:",
+      stepPrefix: "Step",
+      execBtn: "Execute Step",
       clear: "Clear",
       chips: [
         "Summarise Jaffer Sadiq drug cartel investigation",
@@ -1974,12 +1961,13 @@ route();
       ]
     },
     hi: {
-      title: "क्रोनोस कोपायलट (COPILOT)",
-      live: "मास्टर इंजन",
-      placeholder: "कमांड लिखें (जैसे 'जाफर सादिक डोजियर', 'जब्ती विवरण', '3D ग्राफ') या सवाल पूछें...",
-      thinking: "🧠 एआई की सोच • फोरेंसिक तर्क प्रक्रिया",
-      actionReady: "⚡ निष्पादन के लिए तैयार:",
-      actionDone: "✓ चरण संपन्न हुआ:",
+      title: "क्रोनोस कोपायलट",
+      live: "फोरेंसिक इंजन",
+      placeholder: "जांच संबंधी प्रश्न लिखें या नीचे से विश्लेषण चुनें...",
+      thinking: "फोरेंसिक तर्क • विश्लेषणात्मक सत्यापन चरण",
+      actionReady: "कार्रवाई प्रेषण:",
+      actionDone: "चरण संपन्न:",
+      stepPrefix: "चरण",
       execBtn: "चरण चलाएं",
       clear: "साफ़ करें",
       chips: [
@@ -1991,13 +1979,14 @@ route();
       ]
     },
     gu: {
-      title: "ક્રોનોસ કોપાયલટ (COPILOT)",
-      live: "માસ્ટર એન્જિન",
-      placeholder: "કમાન્ડ લખો (દા.ત. 'જાફર સાદિક પ્રોફાઇલ', 'ડ્રગ્સ જપ્તી', '3D ગ્રાફ') અથવા પ્રશ્ન પૂછો...",
-      thinking: "🧠 AI તર્ક પ્રક્રિયા • ફોરેન્સિક એનાલિસિસ",
-      actionReady: "⚡ ચલાવવા માટે તૈયાર:",
-      actionDone: "✓ પગલું સંપન્ન થયું:",
-      execBtn: "પગલું ચલાવો",
+      title: "ક્રોનોસ કોપાયલટ",
+      live: "ફોરેન્સિક એન્જિન",
+      placeholder: "તપાસ પ્રશ્ન લખો અથવા નીચેથી વિશ્લેષણ પસંદ કરો...",
+      thinking: "ફોરેન્સિક તર્ક • વિશ્લેષણાત્મક વેરિફિકેશન પગલાં",
+      actionReady: "કાર્યવાહી ડિસ્પેચ:",
+      actionDone: "પગલું સંપન્ન:",
+      stepPrefix: "પગલું",
+      execBtn: "પગલું અમલમાં મૂકો",
       clear: "સાફ કરો",
       chips: [
         "જાફર સાદિક ડ્રગ કાર્ટેલ કેસનો સારાંશ",
@@ -2016,13 +2005,15 @@ route();
     if (h.startsWith("p/")) {
       const pId = h.split("/")[1];
       const p = PERS.find(x => x.id === pId) || { n: pId };
-      b.textContent = `📍 Context: Dossier ${pId} (${p.n})`;
+      b.textContent = cLang === "hi" ? `संदर्भ: डोजियर ${pId} (${p.n})` : cLang === "gu" ? `સંદર્ભ: પ્રોફાઇલ ${pId} (${p.n})` : `Active Context: Dossier ${pId} (${p.n})`;
     } else if (h === "graph") {
-      b.textContent = "📍 Context: 3D Relationship Topology (6 Nodes • Master Network)";
+      b.textContent = cLang === "hi" ? "संदर्भ: 3D संबंध टोपोलॉजी (सिंडिकेट मास्टर नेटवर्क)" : cLang === "gu" ? "સંદર્ભ: 3D સંબંધ ટોપોલોજી (સિન્ડિકેટ માસ્ટર નેટવર્ક)" : "Active Context: 3D Relationship Topology (Master Syndicate Network)";
     } else if (h === "dash") {
-      b.textContent = "📍 Context: Investigations & Persons Split Dashboard";
+      b.textContent = cLang === "hi" ? "संदर्भ: अन्वेषण एवं संदिग्ध स्प्लिट डैशबोर्ड" : cLang === "gu" ? "સંદર્ભ: તપાસ અને શંકાસ્પદો સ્પ્લિટ ડેશબોર્ડ" : "Active Context: Investigations & Persons Split Dashboard";
+    } else if (h.startsWith("case/") || h === "case") {
+      b.textContent = cLang === "hi" ? "संदर्भ: प्रमुख मामला KRONOS-2024-001 (जाफर सादिक बहु-एजेंसी जांच)" : cLang === "gu" ? "સંદર્ભ: મુખ્ય કેસ KRONOS-2024-001 (જાફર સાદિક મલ્ટી-એજન્સી તપાસ)" : "Active Context: Featured Case KRONOS-2024-001 (Jaffer Sadiq Multi-Agency Investigation)";
     } else {
-      if (h.startsWith("case/") || h === "case") { b.textContent = "📍 Context: Featured Case KRONOS-2024-001 (Jaffer Sadiq Multi-Agency Investigation)"; } else { b.textContent = "📍 Context: Consolidated Master Engine (Featured Case KRONOS-2024-001)"; }
+      b.textContent = cLang === "hi" ? "संदर्भ: क्रोनोस केंद्रीय फोरेंसिक मास्टर इंजन" : cLang === "gu" ? "સંદર્ભ: ક્રોનોસ સેન્ટ્રલ ફોરેન્સિક માસ્ટર એન્જિન" : "Active Context: Consolidated Master Engine (Featured Case KRONOS-2024-001)";
     }
   }
   addEventListener("hashchange", updateContextBanner);
@@ -2034,16 +2025,68 @@ route();
     let reasoning = [];
     let action = null;
 
-    // A. 50.070 kg Pseudoephedrine Seizure & Godown Raid
-    if (/seizure|50kg|50\.070|pseudoephedrine|basai|darapur|godown|warehouse|जब्ती|गोदाम|સ્યુડો|જપ્તી|ગોડાઉન/.test(q)) {
-      reasoning = [
-        "Query Intent: Precursor Narcotics Seizure Extraction (NCB Case Cr-03/2024).",
-        "Ingested Evidence: 50.070 kg pseudoephedrine seized at Basai Darapur, West Delhi on 15 Feb 2024.",
-        "Accused on Site: Mukesh (P-MUK01), Mujibur Rahman (P-MUJ01), Ashok Kumar (P-ASH01).",
-        "Concealment Method: Concealed inside 25 kg multi-grain food mix and desiccated coconut powder packets destined for Australia and New Zealand."
-      ];
-
+    // 1. Comprehensive Drug Cartel Investigation Summary (Triggered when user asks to summarize cartel, investigation, or case)
+    if (/summar|overview|cartel|syndicate|drug|investigation|trafficking|सारांश|विहंगम|કેસ|કાર્ટેલ|તપાસ|વિહંગાવલોકન/.test(q)) {
       if (lang === "hi") {
+        reasoning = [
+          "विधिक दायरा: एनसीबी (NCB) दिल्ली और प्रवर्तन निदेशालय (ED) चेन्नई के मुकदमों का संयुक्त विश्लेषण।",
+          "भौतिक बरामदगी: बसई दारापुर गोदाम (पश्चिमी दिल्ली) से 50.070 किग्रा स्यूडोएफ़ेड्रिन जब्त (15 फरवरी 2024)।",
+          "वित्तीय लेयरिंग: प्रवर्तन निदेशालय (ED) द्वारा ₹55.30 करोड़ की संपत्तियों की अनंतिम कुर्की (4 सितंबर 2024)।",
+          "न्यायिक स्थिति: मद्रास हाईकोर्ट द्वारा नियमित जमानत मंजूर (21 अप्रैल 2025); सुप्रीम कोर्ट द्वारा जमानत में हस्तक्षेप से इनकार (18 सितंबर 2026)।"
+        ];
+        answerText = `<b>जाफर सादिक अंतर्राष्ट्रीय ड्रग तस्करी एवं मनी लॉन्ड्रिंग जांच का सारांश (KRONOS-2024-001):</b><br><br>
+• <b>नशीले पदार्थों के प्रीकर्सर की जब्ती:</b> 15 फरवरी 2024 को एनसीबी (NCB) और दिल्ली पुलिस ने पश्चिमी दिल्ली के बसई दारापुर स्थित गोदाम पर छापा मारकर <b>50.070 किग्रा स्यूडोएफ़ेड्रिन</b> बरामद किया। इसे ऑस्ट्रेलिया और न्यूजीलैंड भेजने के लिए हेल्थ फूड मिक्स और सूखे नारियल पाउडर के पैकेटों में छुपाया गया था।<br>
+• <b>गिरफ्तारियां:</b> गोदाम से मुकेश (P-MUK01), मुजीबुर रहमान (P-MUJ01), और अशोक कुमार (P-ASH01) को पकड़ा गया। मोबाइल फॉरेंसिक जांच में तमिल फिल्म निर्माता जाफर सादिक के मुख्य साजिशकर्ता होने की पुष्टि हुई, जिन्हें 9 मार्च 2024 को नई दिल्ली से गिरफ्तार किया गया।<br>
+• <b>पुराने प्रेडिकेट मामले:</b> जांच में 2015 चेन्नई एयर कार्गो जब्ती और 2019 मुंबई कस्टम्स मिसडिक्लेरेशन मामलों से सिंडिकेट का संबंध स्थापित हुआ।<br>
+• <b>ईडी मनी लॉन्ड्रिंग जांच:</b> प्रवर्तन निदेशालय ने जून 2024 में पीएमएलए (PMLA) के तहत जाफर सादिक को गिरफ्तार किया। अपराध की आय को तमिल फिल्म निर्माण (JSM Pictures), होटल खरीद (JSM Residency), और रियल एस्टेट में खपाया गया।<br>
+• <b>₹55.30 करोड़ की संपत्ति अटैच:</b> ईडी ने 4 सितंबर 2024 को ₹55.30 करोड़ की चल-अचल संपत्तियां कुर्क कीं और 13 नवंबर 2024 को 20 आरोपियों के खिलाफ चेन्नई स्पेशल कोर्ट में चार्जशीट दायर की।<br>
+• <b>न्यायिक घटनाक्रम:</b> मद्रास हाईकोर्ट ने 21 अप्रैल 2025 को जाफर सादिक को नियमित जमानत दी, जिसे 18 सितंबर 2026 को सुप्रीम कोर्ट ने भी बरकरार रखा।`;
+      } else if (lang === "gu") {
+        reasoning = [
+          "તપાસ ક્ષેત્ર: NCB દિલ્હી અને એન્ફોર્સમેન્ટ ડિરેક્ટોરેટ (ED) ના સંયુક્ત કેસ દસ્તાવેજોનું વિશ્લેષણ.",
+          "ભૌતિક જપ્તી: પશ્ચિમ દિલ્હીના બસઈ દારાપુર ગોડાઉનમાંથી 50.070 કિગ્રા સ્યુડોએફેડ્રિન જપ્ત (15 ફેબ્રુઆરી 2024).",
+          "નાણાકીય તપાસ: એન્ફોર્સમેન્ટ ડિરેક્ટોરેટ (ED) દ્વારા ₹55.30 કરોડની મિલકતો પ્રોવિઝનલ અટેચ (4 સપ્ટેમ્બર 2024).",
+          "ન્યાયિક સ્થિતિ: મદ્રાસ હાઈકોર્ટ દ્વારા જામીન મંજૂર (21 એપ્રિલ 2025); સુપ્રીમ કોર્ટ દ્વારા હસ્તક્ષેપ કરવાનો ઇનકાર (18 સપ્ટેમ્બર 2026)."
+        ];
+        answerText = `<b>જાફર સાદિક આંતરરાષ્ટ્રીય ડ્રગ ટ્રાફિકિંગ અને મની લોન્ડરિંગ તપાસનો સારાંશ (KRONOS-2024-001):</b><br><br>
+• <b>કેમિકલ પ્રીકર્સરની જપ્તી:</b> 15 ફેબ્રુઆરી 2024 ના રોજ NCB અને દિલ્હી પોલીસે પશ્ચિમ દિલ્હીના બસઈ દારાપુર ગોડાઉન પર દરોડો પાડીને <b>50.070 કિગ્રા સ્યુડોએફેડ્રિન</b> જપ્ત કર્યું. આ જથ્થો ઓસ્ટ્રેલિયા અને ન્યુઝીલેન્ડ મોકલવા માટે હેલ્થ ફૂડ મિક્સ અને નાળિયેર પાવડરના પેકેટોમાં છુપાવવામાં આવ્યો હતો.<br>
+• <b>ધરપકડ:</b> ગોડાઉનમાંથી મુકેશ (P-MUK01), મુજીબુર રહેમાન (P-MUJ01), અને અશોક કુમાર (P-ASH01) પકડાયા. ડિજિટલ ફોરેન્સિક તપાસમાં તમિલ ફિલ્મ નિર્માતા જાફર સાદિક મુખ્ય સૂત્રધાર તરીકે સામે આવ્યા, જેમને 9 માર્ચ 2024 ના રોજ નવી દિલ્હીથી પકડવામાં આવ્યા.<br>
+• <b>જૂના પ્રિડિકેટ કેસો:</b> તપાસમાં 2015 ચેન્નાઈ એર કાર્ગો જપ્તી અને 2019 મુંબઈ કસ્ટમ્સ મિસડિક્લેરેશન કેસો સાથે સિન્ડિકેટની કડીઓ મળી આવી.<br>
+• <b>ED મની લોન્ડરિંગ તપાસ:</b> એન્ફોર્સમેન્ટ ડિરેક્ટોરેટે જૂન 2024 માં PMLA હેઠળ જાફર સાદિકની ધરપકડ કરી. ગુનાની રકમ તમિલ ફિલ્મ નિર્માણ (JSM Pictures), હોટેલ ખરીદી (JSM Residency), અને રિયલ એસ્ટેટમાં વાળવામાં આવી હતી.<br>
+• <b>₹55.30 કરોડની મિલકત જપ્ત:</b> ED એ 4 સપ્ટેમ્બર 2024 ના રોજ ₹55.30 કરોડની મિલકતો અટેચ કરી અને 13 નવેમ્બર 2024 ના રોજ ચેન્નાઈ સ્પેશિયલ કોર્ટમાં 20 આરોપીઓ સામે ફરિયાદ દાખલ કરી.<br>
+• <b>અદાલતી ચુકાદાઓ:</b> મદ્રાસ હાઈકોર્ટે 21 એપ્રિલ 2025 ના રોજ નિયમિત જામીન મંજૂર કર્યા, જેને 18 સપ્ટેમ્બર 2026 ના રોજ સુપ્રીમ કોર્ટે પણ કાયમ રાખ્યા.`;
+      } else {
+        reasoning = [
+          "Jurisdictional Scope: Ingesting joint NCB Cr-03/2024 and ED PMLA ECIR/MDSZO/05/2024 dockets.",
+          "Physical Contraband: 50.070 kg pseudoephedrine seized at Basai Darapur, West Delhi (15 Feb 2024).",
+          "Financial Trail: ₹55.30 crore assets provisionally attached by Enforcement Directorate (4 Sept 2024).",
+          "Judicial Status: Madras High Court regular bail granted (21 Apr 2025); Supreme Court declined interference (18 Sept 2026)."
+        ];
+        answerText = `<b>Jaffer Sadiq International Drug Trafficking & Money-Laundering Investigation (KRONOS-2024-001):</b><br><br>
+• <b>Precursor Narcotics Seizure:</b> On 15 Feb 2024, the NCB and Delhi Police seized <b>50.070 kg of pseudoephedrine</b> (chemical precursor for methamphetamine) from a godown in Basai Darapur, West Delhi. The contraband was concealed inside 25 kg multi-grain food mix and desiccated coconut powder packets destined for Australia and New Zealand.<br>
+• <b>Accused & Interceptions:</b> Mukesh (P-MUK01), Mujibur Rahman (P-MUJ01), and Ashok Kumar (P-ASH01) were arrested on site. Digital phone extractions identified Tamil film producer Jaffer Sadiq as the mastermind; he was arrested in New Delhi on 9 March 2024.<br>
+• <b>Predicate Customs History:</b> The syndicate was linked to earlier customs seizures, notably the 2015 Chennai Air Cargo pseudoephedrine interception and a 2019 Mumbai Customs export misdeclaration docket.<br>
+• <b>ED Money-Laundering Probe (PMLA):</b> The Enforcement Directorate arrested Jaffer Sadiq in June 2024 under ECIR/MDSZO/05/2024. Illicit proceeds were laundered through Tamil feature film production (JSM Pictures), hotel acquisition (JSM Residency), and real estate assets.<br>
+• <b>Asset Attachment & Complaint:</b> The ED provisionally attached assets worth ₹55.30 crore on 4 Sept 2024 and filed a prosecution complaint naming 20 accused on 13 Nov 2024 before the Chennai Special PMLA Court.<br>
+• <b>Court Milestones:</b> The Madras High Court granted bail to Jaffer Sadiq on 21 April 2025; on 18 September 2026, the Supreme Court of India declined to interfere with the bail order.`;
+      }
+
+      action = {
+        type: "NAV",
+        target: "case/KRONOS-2024-001",
+        label: lang === "hi" ? "केस वर्कस्पेस खोलें" : lang === "gu" ? "કેસ વર્કસ્પેસ ખોલો" : "Open Investigation Workspace"
+      };
+      return { answerText, reasoning, action, executed: false };
+    }
+
+    // 2. 50.070 kg Pseudoephedrine Seizure & Godown Raid
+    if (/seizure|50kg|50\.070|pseudoephedrine|basai|darapur|godown|warehouse|जब्ती|गोदाम|સ્યુડો|જપ્તી|ગોડાઉન/.test(q)) {
+      if (lang === "hi") {
+        reasoning = [
+          "सत्यापन लक्ष्य: एनसीबी (NCB) दिल्ली मुकदमा Cr-03/2024 से संबंधित साक्ष्य निष्कर्षण।",
+          "बरामदगी: 50.070 किग्रा स्यूडोएफ़ेड्रिन, बसई दारापुर गोदाम (15 फरवरी 2024)।",
+          "संबद्ध आरोपी: मुकेश, मुजीबुर रहमान, और अशोक कुमार।"
+        ];
         answerText = `<b>[50.070 किग्रा स्यूडोएफ़ेड्रिन जब्ती — बसई दारापुर गोदाम]</b><br>
 • <b>जब्ती की तारीख:</b> 15 फरवरी 2024<br>
 • <b>स्थल:</b> बसई दारापुर, पश्चिमी दिल्ली स्थित गोदाम<br>
@@ -2051,6 +2094,11 @@ route();
 • <b>छुपाने की तकनीक:</b> हेल्थ मिक्स और सूखे नारियल पाउडर के पैकेटों में छिपाकर ऑस्ट्रेलिया और न्यूजीलैंड भेजने की तैयारी।<br>
 • <b>मौके पर गिरफ्तार:</b> मुकेश (P-MUK01), मुजीबुर रहमान (P-MUJ01), और अशोक कुमार (P-ASH01)। डिजिटल साक्ष्यों से मास्टरमाइंड के रूप में तमिल फिल्म निर्माता जाफर सादिक की पहचान हुई।`;
       } else if (lang === "gu") {
+        reasoning = [
+          "વેરિફિકેશન ટાર્ગેટ: NCB દિલ્હી કેસ Cr-03/2024 પુરાવા એક્સટ્રેક્શન.",
+          "જપ્તી: 50.070 કિગ્રા સ્યુડોએફેડ્રિન, બસઈ દારાપુર ગોડાઉન (15 ફેબ્રુઆરી 2024).",
+          "સંકળાયેલ આરોપી: મુકેશ, મુજીબુર રહેમાન, અને અશોક કુમાર."
+        ];
         answerText = `<b>[50.070 કિગ્રા સ્યુડોએફેડ્રિન જપ્તી — બસઈ દારાપુર ગોડાઉન]</b><br>
 • <b>જપ્તીની તારીખ:</b> 15 ફેબ્રુઆરી 2024<br>
 • <b>સ્થળ:</b> બસઈ દારાપુર, પશ્ચિમ દિલ્હી ગોડાઉન<br>
@@ -2058,6 +2106,11 @@ route();
 • <b>છુપાવવાની પદ્ધતિ:</b> હેલ્થ ફૂડ મિક્સ અને નારિયેળ પાવડરના પેકેટોમાં ઓસ્ટ્રેલિયા અને ન્યુઝીલેન્ડ મોકલવાની તૈયારી.<br>
 • <b>સ્થળ પર ધરપકડ:</b> મુકેશ (P-MUK01), મુજીબુર રહેમાન (P-MUJ01), અને અશોક કુમાર (P-ASH01). ડિજિટલ પુરાવા પરથી તમિલ ફિલ્મ નિર્માતા જાફર સાદિક મુખ્ય આરોપી તરીકે પકડાયા.`;
       } else {
+        reasoning = [
+          "Verification Target: Precursor Narcotics Seizure Extraction (NCB Case Cr-03/2024).",
+          "Ingested Evidence: 50.070 kg pseudoephedrine seized at Basai Darapur, West Delhi (15 Feb 2024).",
+          "Accused on Site: Mukesh (P-MUK01), Mujibur Rahman (P-MUJ01), Ashok Kumar (P-ASH01)."
+        ];
         answerText = `<b>[50.070 kg Pseudoephedrine Seizure — Basai Darapur Warehouse]</b><br>
 • <b>Date of Seizure:</b> 15 February 2024<br>
 • <b>Location:</b> Basai Darapur, West Delhi godown<br>
@@ -2075,17 +2128,14 @@ route();
       return { answerText, reasoning, action, executed: false };
     }
 
-    // B. ED Asset Attachment (₹55.30 Crore) & Money Laundering
+    // 3. ED Asset Attachment (₹55.30 Crore) & Money Laundering
     if (/attach|55|crore|property|asset|jsm|hotel|residency|laundering|pmla|सम्पत्ति|अटैच|होटल|પ્રોપર્ટી|અટેચ|હોટેલ|મિલકત/.test(q)) {
-      reasoning = [
-        "Query Intent: Financial Forensics & PMLA Asset Attachment Audit.",
-        "Authority: Directorate of Enforcement (ED), Chennai Zonal Office.",
-        "Statutory Action: Provisional Attachment Order (PAO) issued 4 Sept 2024; Prosecution Complaint filed 13 Nov 2024.",
-        "Valuation: ₹55.30 crore provisionally attached across movable and immovable assets.",
-        "Channels: JSM Pictures (film production financing), JSM Residency (hospitality front), luxury vehicles, and commercial plots."
-      ];
-
       if (lang === "hi") {
+        reasoning = [
+          "वित्तीय फोरेंसिक: पीएमएलए (PMLA) के तहत अपराध की आय का पता लगाना।",
+          "सक्षम प्राधिकारी: प्रवर्तन निदेशालय (ED), चेन्नई जोनल कार्यालय।",
+          "कुर्की मूल्यांकन: ₹55.30 करोड़ की चल-अचल संपत्तियां अनंतिम रूप से कुर्क (4 सितंबर 2024)।"
+        ];
         answerText = `<b>[प्रवर्तन निदेशालय (ED) संपत्तियों की जब्ती — ₹55.30 करोड़]</b><br>
 • <b>संलग्न संपत्ति का मूल्य:</b> ₹55.30 करोड़ (अनंतिम कुर्की आदेश - 4 सितंबर 2024)<br>
 • <b>लॉन्ड्रिंग के मुख्य साधन:</b><br>
@@ -2094,6 +2144,11 @@ route();
   - लक्जरी वाहन और चेन्नई स्थित व्यावसायिक भूखंड।<br>
 • <b>अभियोजन शिकायत:</b> 13 नवंबर 2024 को चेन्नई विशेष PMLA अदालत में 20 आरोपियों के खिलाफ दायर की गई।`;
       } else if (lang === "gu") {
+        reasoning = [
+          "નાણાકીય ફોરેન્સિક્સ: PMLA હેઠળ ગુનાની રકમનું ટ્રેકિંગ.",
+          "સત્તાવાળા: એન્ફોર્સમેન્ટ ડિરેક્ટોરેટ (ED), ચેન્નાઈ ઝોનલ ઓફિસ.",
+          "મિલકત મૂલ્યાંકન: ₹55.30 કરોડની મિલકતો પ્રોવિઝનલ અટેચ (4 સપ્ટેમ્બર 2024)."
+        ];
         answerText = `<b>[એન્ફોર્સમેન્ટ ડિરેક્ટોરેટ (ED) સંપત્તિ અટેચમેન્ટ — ₹55.30 કરોડ]</b><br>
 • <b>અટેચ કરેલી મિલકતનું મૂલ્ય:</b> ₹55.30 કરોડ (પ્રોવિઝનલ અટેચમેન્ટ ઓર્ડર - 4 સપ્ટેમ્બર 2024)<br>
 • <b>મની લોન્ડરિંગના મુખ્ય માધ્યમો:</b><br>
@@ -2102,6 +2157,11 @@ route();
   - લક્ઝરી કાર અને ચેન્નાઈ સ્થિત કોમર્શિયલ પ્લોટ્સ.<br>
 • <b>ફરિયાદ દાખલ:</b> 13 નવેમ્બર 2024 ના રોજ ચેન્નાઈ સ્પેશિયલ PMLA કોર્ટમાં 20 આરોપીઓ સામે કેસ નોંધાયો.`;
       } else {
+        reasoning = [
+          "Financial Forensics: Audit of Crime Proceeds under PMLA ECIR/MDSZO/05/2024.",
+          "Authority: Enforcement Directorate (ED), Chennai Zonal Office.",
+          "Valuation: ₹55.30 crore provisionally attached (4 Sept 2024)."
+        ];
         answerText = `<b>[Enforcement Directorate (ED) Asset Attachment — ₹55.30 Crore]</b><br>
 • <b>Provisionally Attached Value:</b> ₹55.30 crore under PMLA (Provisional Attachment Order, 4 Sept 2024).<br>
 • <b>Laundering Infrastructure:</b><br>
@@ -2120,26 +2180,34 @@ route();
       return { answerText, reasoning, action, executed: false };
     }
 
-    // C. Bail Decisions: Madras High Court & Supreme Court
+    // 4. Bail Decisions: Madras High Court & Supreme Court
     if (/bail|court|madras|high court|supreme court|judgment|order|जमानत|कोर्ट|हाईकोर्ट|સુપ્રીમ|જામીન|હાઈકોર્ટ/.test(q)) {
-      reasoning = [
-        "Query Intent: Judicial Milestones & Bail Evaluation (PMLA Docket).",
-        "Madras High Court Ruling: 21 April 2025 — Granted bail to Jaffer Sadiq in ED money-laundering proceedings.",
-        "Judicial Grounds: Evaluation of procedural aspects, predicate 2015/2019 customs records, and completion of prosecution complaint filing.",
-        "Supreme Court of India: 18 September 2026 — Declined to interfere with the High Court bail order; trial to proceed before Special Court."
-      ];
-
       if (lang === "hi") {
+        reasoning = [
+          "न्यायिक स्थिति विश्लेषण: मद्रास हाईकोर्ट और सुप्रीम कोर्ट के आदेशों की समीक्षा।",
+          "हाईकोर्ट निर्णय: 21 अप्रैल 2025 को जाफर सादिक को नियमित जमानत मंजूर।",
+          "सुप्रीम कोर्ट समीक्षा: 18 सितंबर 2026 को हाईकोर्ट के आदेश में हस्तक्षेप से इनकार।"
+        ];
         answerText = `<b>[न्यायिक स्थिति: मद्रास हाईकोर्ट जमानत और सुप्रीम कोर्ट फैसला]</b><br>
 • <b>मद्रास हाईकोर्ट (21 अप्रैल 2025):</b> जाफर सादिक को ईडी के मनी लॉन्ड्रिंग मामले में नियमित जमानत दी गई। अदालत ने 2015 और 2019 के प्रेडिकेट कस्टम्स रिकॉर्ड्स और शिकायत की स्थिति का मूल्यांकन किया।<br>
 • <b>सुप्रीम कोर्ट (18 सितंबर 2026):</b> सर्वोच्च न्यायालय ने मद्रास हाईकोर्ट के जमानत आदेश में हस्तक्षेप करने से इनकार कर दिया।<br>
-• <b>कानूनी स्थिति:</b> जमानत केवल मुकदमे के दौरान राहत है; विशेष पीएमएलए अदालत में ट्रायल जारी रहेगा।`;
+• <b>कानूनी स्थिति:</b> जमानत केवल मुकदमे के दौरान अंतरिम राहत है; विशेष पीएमएलए अदालत में ट्रायल जारी रहेगा।`;
       } else if (lang === "gu") {
+        reasoning = [
+          "અદાલતી ચુકાદાઓનું વિશ્લેષણ: મદ્રાસ હાઈકોર્ટ અને સુપ્રીમ કોર્ટ આદેશોની સમીક્ષા.",
+          "હાઈકોર્ટ નિર્ણય: 21 એપ્રિલ 2025 ના રોજ નિયમિત જામીન મંજૂર.",
+          "સુપ્રીમ કોર્ટ સમીક્ષા: 18 સપ્ટેમ્બર 2026 ના રોજ હસ્તક્ષેપ કરવાનો ઇનકાર."
+        ];
         answerText = `<b>[ન્યાયિક સ્થિતિ: મદ્રાસ હાઈકોર્ટ જામીન અને સુપ્રીમ કોર્ટ ચુકાદો]</b><br>
 • <b>મદ્રાસ હાઈકોર્ટ (21 એપ્રિલ 2025):</b> ED મની લોન્ડરિંગ કેસમાં જાફર સાદિકને નિયમિત જામીન મંજૂર કરાયા. કોર્ટે 2015 અને 2019 ના પ્રિડિકેટ કસ્ટમ્સ રેકોર્ડ્સનું મૂલ્યાંકન કર્યું.<br>
 • <b>સુપ્રીમ કોર્ટ (18 સપ્ટેમ્બર 2026):</b> સર્વોચ્ચ અદાલતે હાઈકોર્ટના જામીન આદેશમાં હસ્તક્ષેપ કરવાનો ઇનકાર કર્યો.<br>
 • <b>કાનૂની સ્થિતિ:</b> જામીન માત્ર ટ્રાયલ દરમિયાન મુક્તિ છે; વિશેષ PMLA કોર્ટમાં કેસ ચાલુ રહેશે.`;
       } else {
+        reasoning = [
+          "Judicial Status Analysis: Review of Madras High Court and Supreme Court Orders.",
+          "High Court Ruling: 21 April 2025 — Regular bail granted under PMLA.",
+          "Supreme Court Review: 18 September 2026 — Declined to interfere with bail order."
+        ];
         answerText = `<b>[Judicial Milestones: Madras High Court Bail & Supreme Court Review]</b><br>
 • <b>Madras High Court (21 April 2025):</b> Granted regular bail to Jaffer Sadiq in the ED PMLA money-laundering case, examining procedural timelines, the status of investigation, and earlier 2015/2019 predicate customs dockets.<br>
 • <b>Supreme Court of India (18 September 2026):</b> Declined to interfere with the High Court bail decision, allowing trial proceedings to continue before the Chennai Special PMLA Court.<br>
@@ -2155,26 +2223,34 @@ route();
       return { answerText, reasoning, action, executed: false };
     }
 
-    // D. Predicate Cases (2015 Chennai Customs & 2019 Mumbai Customs)
+    // 5. Predicate Cases (2015 Chennai Customs & 2019 Mumbai Customs)
     if (/predicate|2015|2019|customs|air cargo|chennai customs|mumbai customs|कस्टम|प्रेडिकेट|પ્રિડિકેટ|કસ્ટમ્સ/.test(q)) {
-      reasoning = [
-        "Query Intent: Predicate Offence Architecture & Customs Interception History.",
-        "Predicate Case 1: Chennai Customs (August 2015) — Pseudoephedrine air cargo export interception.",
-        "Predicate Case 2: Mumbai Customs (November 2019) — Commercial air cargo misdeclaration docket.",
-        "Legal Role: Served as predicate FIR materials founding the Enforcement Directorate's PMLA ECIR/MDSZO/05/2024."
-      ];
-
       if (lang === "hi") {
+        reasoning = [
+          "प्रेडिकेट अपराध संरचना: पुराने कस्टम्स मामलों का विश्लेषण।",
+          "मामला 1: चेन्नई कस्टम्स (अगस्त 2015) — स्यूडोएफ़ेड्रिन एयर कार्गो जब्ती।",
+          "मामला 2: मुंबई कस्टम्स (नवंबर 2019) — वाणिज्यिक निर्यात मिसडिक्लेरेशन।"
+        ];
         answerText = `<b>[प्रेडिकेट मामले: 2015 चेन्नई और 2019 मुंबई कस्टम्स रिकॉर्ड्स]</b><br>
 • <b>चेन्नई कस्टम्स (अगस्त 2015):</b> एयर कार्गो टर्मिनल पर स्यूडोएफ़ेड्रिन की जब्ती, जिसका उल्लेख 2025 के हाईकोर्ट जमानत आदेश में प्रेडिकेट अपराध के रूप में किया गया।<br>
 • <b>मुंबई कस्टम्स (नवंबर 2019):</b> निर्यात कार्गो के गलत घोषणा (Misdeclaration) का मामला।<br>
 • <b>महत्व:</b> ये पुराने मामले पीएमएलए (PMLA) के तहत ईडी की मनी लॉन्ड्रिंग जांच का विधिक आधार बने।`;
       } else if (lang === "gu") {
+        reasoning = [
+          "પ્રિડિકેટ ગુના સંરચના: જૂના કસ્ટમ્સ કેસોનું વિશ્લેષણ.",
+          "કેસ 1: ચેન્નાઈ કસ્ટમ્સ (ઓગસ્ટ 2015) — સ્યુડોએફેડ્રિન એર કાર્ગો જપ્તી.",
+          "કેસ 2: મુંબઈ કસ્ટમ્સ (નવેમ્બર 2019) — કોમર્શિયલ એક્સપોર્ટ મિસડિક્લેરેશન."
+        ];
         answerText = `<b>[પ્રિડિકેટ કેસો: 2015 ચેન્નાઈ અને 2019 મુંબઈ કસ્ટમ્સ રેકોર્ડ્સ]</b><br>
 • <b>ચેન્નાઈ કસ્ટમ્સ (ઓગસ્ટ 2015):</b> એર કાર્ગો ટર્મિનલ પર સ્યુડોએફેડ્રિનની જપ્તી, જેનો ઉલ્લેખ 2025 ના હાઈકોર્ટ જામીન ચુકાદામાં પ્રિડિકેટ ગુના તરીકે થયો.<br>
 • <b>મુંબઈ કસ્ટમ્સ (નવેમ્બર 2019):</b> એક્સપોર્ટ કાર્ગો મિસડિક્લેરેશનનો કેસ.<br>
 • <b>મહત્વ:</b> આ જૂના કેસો PMLA હેઠળ ED ની મની લોન્ડરિંગ તપાસનો કાનૂની પાયો બન્યા.`;
       } else {
+        reasoning = [
+          "Predicate Offence Architecture: Ingestion of Historical Customs Interceptions.",
+          "Docket 1: Chennai Customs (August 2015) — Air cargo pseudoephedrine seizure.",
+          "Docket 2: Mumbai Customs (November 2019) — Commercial air cargo misdeclaration."
+        ];
         answerText = `<b>[Predicate Cases: 2015 Chennai Customs & 2019 Mumbai Customs Dockets]</b><br>
 • <b>Chennai Customs (August 2015):</b> Air cargo interception involving concealed pseudoephedrine, cited as predicate material in the 21 April 2025 Madras High Court bail judgment.<br>
 • <b>Mumbai Customs (November 2019):</b> Commercial export misdeclaration docket involving front logistics credentials.<br>
@@ -2190,25 +2266,31 @@ route();
       return { answerText, reasoning, action, executed: false };
     }
 
-    // E. Next Best Evidence & Analytical Hypotheses
+    // 6. Next Best Evidence & Analytical Hypotheses
     if (/lead|suggest|next|evidence|hypothesis|अग्रिम|साक्ष्य|पुख्ता|પુરાવા|લીડ/.test(q)) {
-      reasoning = [
-        "Query Intent: KRONOS Detective Next Best Evidence Synthesis.",
-        "Algorithmic Model: Identifying critical evidence gaps, cross-case overlaps, and cross-border verification leads.",
-        "Hypothesis Priority: Flagged 3 actionable investigative verification paths."
-      ];
-
       if (lang === "hi") {
+        reasoning = [
+          "समीक्षा मॉडल: जांच में साक्ष्य अंतराल और अंतर-एजेंसी सत्यापन का विश्लेषण।",
+          "प्राथमिकता: 3 सत्यापित करने योग्य अनुसंधान बिंदु पहचाने गए।"
+        ];
         answerText = `<b>[KRONOS डिटेक्टिव: अग्रिम साक्ष्य और जांच सुझाव (Next Best Evidence)]</b><br>
 1. <b>JSM Pictures विदेशी वितरण अनुबंधों का फोरेंसिक ऑडिट:</b> विदेशी फिल्म वितरण अधिकारों के नाम पर आई रकम का मिलान ऑस्ट्रेलियाई सीमा शुल्क अलर्ट से करें।<br>
 2. <b>एयरवे बिल (AWB) क्रॉस-मैचिंग:</b> 2015 चेन्नई और 2024 दिल्ली कार्गो एजेंटों के मास्टर शिपिंग बिलों का तुलनात्मक मिलान।<br>
 3. <b>पारस्परिक कानूनी सहायता संधि (MLAT):</b> न्यूजीलैंड और ऑस्ट्रेलिया के वित्तीय खुफिया अधिकारियों से विदेशी प्रेषण खातों की पहचान मांगना।`;
       } else if (lang === "gu") {
+        reasoning = [
+          "તપાસ મોડેલ: પુરાવા અંતરાલ અને આંતર-એજન્સી વેરિફિકેશનનું વિશ્લેષણ.",
+          "પ્રાથમિકતા: 3 વેરિફિકેશન કરવા યોગ્ય તપાસ મુદ્દાઓ મળ્યા."
+        ];
         answerText = `<b>[KRONOS ડિટેક્ટિવ: અગ્રેસર પુરાવા અને તપાસ લીડ્સ (Next Best Evidence)]</b><br>
 1. <b>JSM Pictures વિદેશી વિતરણ કોન્ટ્રાક્ટ્સનું ફોરેન્સિક ઓડિટ:</b> વિદેશી મુવી એડવાન્સિસ અને ઓસ્ટ્રેલિયન કાર્ગો ચેતવણીઓનું ક્રોસ-વેરિફિકેશન.<br>
 2. <b>એરવે બિલ્સ (AWB) ક્રોસ-મેચિંગ:</b> 2015 ચેન્નાઈ અને 2024 દિલ્હી કાર્ગો એજન્ટ્સના જીએસટી અને શિપિંગ બિલનું સરખામણી.<br>
 3. <b>મ્યુચ્યુઅલ લીગલ આસિસ્ટન્સ (MLAT):</b> ન્યુઝીલેન્ડ અને ઓસ્ટ્રેલિયાના FIU પાસેથી વિદેશી ટ્રાન્સફર મોકલનારાઓની માહિતી મેળવવી.`;
       } else {
+        reasoning = [
+          "Analytical Model: Evidence Gap Identification and Cross-Border Verification.",
+          "Priority: Flagged 3 actionable investigative verification paths."
+        ];
         answerText = `<b>[KRONOS Detective: Next Best Evidence & Investigative Hypotheses]</b><br>
 1. <b>Forensic Audit of JSM Pictures Distribution Advances:</b> Subpoena overseas film distribution agreements to verify whether foreign inward remittances align with precursor arrival windows in Australia and NZ.<br>
 2. <b>Historical Air Waybill (AWB) Cross-Matching:</b> Cross-reference clearing agent GST ledgers between the 2015 Chennai Customs seizure and the 2024 Basai Darapur consignment.<br>
@@ -2224,26 +2306,34 @@ route();
       return { answerText, reasoning, action, executed: false };
     }
 
-    // F. Impossible Travel & Spatial Anomalies (Haversine Formula)
+    // 7. Impossible Travel & Spatial Anomalies (Haversine Formula)
     if (/travel|impossible|velocity|speed|movement|haversine|spatial|यात्रा|असंभव|ગતિ|પ્રવાસ/.test(q)) {
-      reasoning = [
-        "Algorithmic Check: Evaluating spatio-temporal logs using Haversine Great-Circle formula.",
-        "Parameters: Ground velocity threshold = 160 km/h, Aviation threshold = 850 km/h.",
-        "Calculation: Tower ping in Chennai Harbour CFS followed 15 minutes later by connection at Basai Darapur, Delhi (1,750 km distance).",
-        "Calculated Velocity: v = 7,000 km/h (Anomaly Flag: CRITICAL IMPOSSIBLE TRAVEL)."
-      ];
-
       if (lang === "hi") {
+        reasoning = [
+          "हावरसाइन ग्रेट-सर्कल फॉर्मूला द्वारा दूरी एवं समय अंतराल की गणना।",
+          "पैरामीटर्स: चेन्नई हार्बर सीएफएस और बसई दारापुर (दिल्ली) के बीच 1,750 किमी की दूरी 15 मिनट में दर्ज।",
+          "गणना गति: 7,000 किमी/घंटा (असंभव यात्रा विसंगति)।"
+        ];
         answerText = `<b>[असंभव यात्रा (Impossible Travel) विसंगति का पता चला]</b><br>
 हावरसाइन (Haversine) सूत्र द्वारा किए गए विश्लेषण में चेन्नई हार्बर सीएफएस और पश्चिमी दिल्ली गोदाम के सेलुलर लॉग्स में 15 मिनट के अंतराल पर <b>1,750 किमी</b> का अंतर दर्ज हुआ।<br>
 इसके लिए <b>7,000 किमी/घंटा</b> की गति की आवश्यकता है, जो किसी भी वाणिज्यिक साधन से असंभव है।<br>
 <b>फोरेंसिक निष्कर्ष:</b> डुप्लिकेट क्लोन सिम (Cloned SIM) या एक ही संचार सिंडिकेट पहचान का उपयोग करने वाले दो अलग-अलग ग्राउंड ऑपरेटिव।`;
       } else if (lang === "gu") {
+        reasoning = [
+          "હાવરસાઇન ગ્રેટ-સર્કલ ફોર્મ્યુલા આધારિત અંતર અને સમય અંતરાલની ગણતરી.",
+          "પેરામીટર્સ: ચેન્નાઈ હાર્બર અને બસઈ દારાપુર (દિલ્હી) વચ્ચે 1,750 કિમીનું અંતર 15 મિનિટમાં મળ્યું.",
+          "ગણતરી ઝડપ: 7,000 કિમી/કલાક (અશક્ય પ્રવાસ વિસંગતતા)."
+        ];
         answerText = `<b>[અશક્ય પ્રવાસ (Impossible Travel) વિસંગતતા પકડાઈ]</b><br>
 હાવરસાઇન (Haversine) ફોર્મ્યુલા આધારિત ગણતરીમાં ચેન્નાઈ હાર્બર અને પશ્ચિમ દિલ્હી ગોડાઉનના ટાવર લોગ્સમાં 15 મિનિટમાં <b>1,750 કિમી</b> નું અંતર નોંધાયું.<br>
 આના માટે <b>7,000 કિમી/કલાક</b> ની ગતિ જરૂરી છે, જે શારીરિક રીતે અશક્ય છે.<br>
 <b>ફોરેન્સિક તારણ:</b> ક્લોન કરેલું સિમ (Cloned SIM) અથવા એક જ આઇડી વાપરતા બે અલગ સિન્ડિકેટ સભ્યો.`;
       } else {
+        reasoning = [
+          "Mathematical Verification: Haversine Great-Circle distance evaluation.",
+          "Parameters: Chennai Harbour CFS to Basai Darapur Godown (1,750 km) within 15 minutes.",
+          "Calculated Velocity: 7,000 km/h (Violates physical velocity threshold)."
+        ];
         answerText = `<b>[Impossible Travel Anomaly Detected]</b><br>
 Haversine great-circle spatial analysis flagged an anomaly between cellular tower pings at Chennai Harbour CFS and Basai Darapur Godown, Delhi (1,750 km apart) within a 15-minute delta.<br>
 Required velocity: <b>7,000 km/h</b> (Violates ground and commercial aviation velocity limits).<br>
@@ -2258,28 +2348,7 @@ Required velocity: <b>7,000 km/h</b> (Violates ground and commercial aviation ve
       return { answerText, reasoning, action, executed: false };
     }
 
-    // G. Case Navigation / Workspace
-    if (/case|investigation|docket|workspace|मामले|डैशबोर्ड|કેસ/.test(q) && /open|show|go|view|खोलो|બતાવો/.test(q)) {
-      action = {
-        type: "NAV",
-        target: "case/KRONOS-2024-001",
-        label: lang === "hi" ? "जाफर सादिक केस वर्कस्पेस खोलें" : lang === "gu" ? "જાફર સાદિક કેસ વર્કસ્પેસ ખોલો" : "Open Jaffer Sadiq Investigation Workspace"
-      };
-      reasoning = [
-        "Intent: Navigate to Featured Investigation Workspace (KRONOS-2024-001).",
-        "Scope: Jaffer Sadiq multi-agency narcotics and money-laundering case.",
-        "Action Dispatched: Target synchronized to #case/KRONOS-2024-001."
-      ];
-      answerText = lang === "hi"
-        ? "जाफर सादिक केस वर्कस्पेस पर नेविगेट किया जा रहा है।"
-        : lang === "gu"
-        ? "જાફર સાદિક કેસ વર્કસ્પેસ પર નેવિગેટ થઈ રહ્યું છે."
-        : "Navigating to Jaffer Sadiq Investigation Workspace.";
-      location.hash = action.target;
-      return { answerText, reasoning, action, executed: true };
-    }
-
-    // H. Suspect Navigation
+    // 8. Suspect Identification
     const matchedSuspect = PERS.find(p => q.includes(p.id.toLowerCase()) || q.includes(p.n.toLowerCase().split(" ")[0]) || q.includes(p.n.toLowerCase().split(" ")[1] || ""));
     const isNavVerb = /open|show|go|view|load|navigate|profile|dossier|खोलो|दिखाओ|ખોલો|બતાવો/.test(q);
 
@@ -2289,11 +2358,11 @@ Required velocity: <b>7,000 km/h</b> (Violates ground and commercial aviation ve
         target: `p/${matchedSuspect.id}`,
         label: lang === "hi" ? `${matchedSuspect.n} (${matchedSuspect.id}) का डोजियर खोलें` : lang === "gu" ? `${matchedSuspect.n} (${matchedSuspect.id}) ની પ્રોફાઇલ ખોલો` : `Open ${matchedSuspect.n} (${matchedSuspect.id}) Dossier`
       };
-      reasoning = [
-        `Extracted Entity: ${matchedSuspect.n} (${matchedSuspect.id}, ${matchedSuspect.role})`,
-        `Intent Classification: Direct Navigation -> Route #p/${matchedSuspect.id}`,
-        `Action Dispatched: Target dossier state synchronized.`
-      ];
+      reasoning = lang === "hi"
+        ? [`संबद्ध इकाई: ${matchedSuspect.n} (${matchedSuspect.id})`, "डोजियर नेविगेशन निष्पादित।"]
+        : lang === "gu"
+        ? [`સંકળાયેલ વ્યક્તિ: ${matchedSuspect.n} (${matchedSuspect.id})`, "પ્રોફાઇલ નેવિગેશન સંપન્ન."]
+        : [`Resolved Entity: ${matchedSuspect.n} (${matchedSuspect.id})`, "Navigating to suspect profile."];
       answerText = lang === "hi"
         ? `${matchedSuspect.n} (${matchedSuspect.id}) के फोरेंसिक डोजियर पर नेविगेट किया जा रहा है।`
         : lang === "gu"
@@ -2303,41 +2372,38 @@ Required velocity: <b>7,000 km/h</b> (Violates ground and commercial aviation ve
       return { answerText, reasoning, action, executed: true };
     }
 
-    // I. 3D Graph Navigation
+    // 9. 3D Graph Navigation
     if (/graph|topology|network|3d|ग्राफ|नेटवर्क|ગ્રાફ/.test(q)) {
       action = {
         type: "NAV",
         target: "graph",
         label: lang === "hi" ? "3D नेटवर्क टोपोलॉजी खोलें" : lang === "gu" ? "3D નેટવર્ક ગ્રાફ ખોલો" : "Open 3D Relationship Topology"
       };
-      reasoning = [
-        "Intent: Launch WebGL 3D network topology view.",
-        "Entity Scope: Jaffer Sadiq cartel entities, companies (JSM Pictures, JSM Residency), and precursor corridors.",
-        "Action Dispatched: Route switched to #graph."
-      ];
+      reasoning = lang === "hi"
+        ? ["3D नेटवर्क विज़ुअलाइज़ेशन इंजन प्रारंभ किया गया।"]
+        : lang === "gu"
+        ? ["3D નેટવર્ક વિઝ્યુલાઇઝેશન એન્જિન શરૂ થયું."]
+        : ["Launching WebGL 3D network topology view."];
       answerText = lang === "hi"
         ? "3D नेटवर्क टोपोलॉजी लोड की जा रही है। आप नोड्स को 3D में घुमा और ज़ूम कर सकते हैं।"
         : lang === "gu"
-        ? "3D નેટવર્ક ગ્રાફ લોડ થઈ રહ્યો છે. તમે नोड्सને 3D માં ફેરવી અને ઝૂમ કરી શકો છો."
+        ? "3D નેટવર્ક ગ્રાફ લોડ થઈ રહ્યો છે. તમે નોડ્સને 3D માં ફેરવી અને ઝૂમ કરી શકો છો."
         : "Switching to 3D Relationship Topology. Explore cartel nodes, shell corporate fronts, and international precursor corridors in real-time WebGL space.";
       location.hash = "graph";
       return { answerText, reasoning, action, executed: true };
     }
 
-    // J. Suspect Specific Summary
+    // 10. Suspect Specific Summary
     if (matchedSuspect) {
       const p = matchedSuspect;
       const pEvents = EVT.filter(e => e.p && e.p.includes(p.id));
       const pCases = CASES.filter(c => c.ppl.includes(p.id));
 
-      reasoning = [
-        `Resolved Entity: ${p.n} (${p.id})`,
-        `Ingested Data: ${pEvents.length} multi-modal events across ${pCases.length} cases`,
-        `Role: ${p.role}`,
-        `Cross-Reference: Primary suspect in ${pCases.filter(c=>c.prim.includes(p.id)).length} dockets`
-      ];
-
       if (lang === "hi") {
+        reasoning = [
+          `इकाई समाधान: ${p.n} (${p.id})`,
+          `डेटा विश्लेषण: ${pEvents.length} दर्ज साक्ष्य रिकॉर्ड्स, ${pCases.length} संबद्ध मामले।`
+        ];
         answerText = `<b>${p.n} (${p.id}) का विश्लेषण:</b><br>
 • भूमिका: ${p.role}<br>
 • जुड़े मामले: ${pCases.map(c=>c.id).join(", ")}<br>
@@ -2345,6 +2411,10 @@ Required velocity: <b>7,000 km/h</b> (Violates ground and commercial aviation ve
 • संबद्ध संपत्तियां/डिवाइस: ${p.ents.slice(0, 3).join("; ")}<br>
 • गतिविधि अवधि: ${p.first} से ${p.last}`;
       } else if (lang === "gu") {
+        reasoning = [
+          `વ્યક્તિ વેરિફિકેશન: ${p.n} (${p.id})`,
+          `ડેટા વિશ્લેષણ: ${pEvents.length} નોંધાયેલ પુરાવા રેકોર્ડ્સ, ${pCases.length} સંકળાયેલા કેસો.`
+        ];
         answerText = `<b>${p.n} (${p.id}) નું વિશ્લેષણ:</b><br>
 • ભૂમિકા: ${p.role}<br>
 • સંકળાયેલા કેસો: ${pCases.map(c=>c.id).join(", ")}<br>
@@ -2352,6 +2422,10 @@ Required velocity: <b>7,000 km/h</b> (Violates ground and commercial aviation ve
 • સંકળાયેલ મિલકતો/ડિવાઇસ: ${p.ents.slice(0, 3).join("; ")}<br>
 • પ્રવૃત્તિ ગાળો: ${p.first} થી ${p.last}`;
       } else {
+        reasoning = [
+          `Resolved Entity: ${p.n} (${p.id})`,
+          `Ingested Data: ${pEvents.length} multi-modal events across ${pCases.length} cases.`
+        ];
         answerText = `<b>Analysis for ${p.n} (${p.id}):</b><br>
 • Role: ${p.role}<br>
 • Associated Dockets: ${pCases.map(c=>c.id).join(", ")}<br>
@@ -2368,25 +2442,31 @@ Required velocity: <b>7,000 km/h</b> (Violates ground and commercial aviation ve
       return { answerText, reasoning, action, executed: false };
     }
 
-    // K. Default Master Case Intelligence Overview
-    reasoning = [
-      "Query Intent: General investigation intelligence synthesis.",
-      "Scope: Featured Case KRONOS-2024-001 (Jaffer Sadiq Alleged Cartel Investigation).",
-      "Tracking 6 core entities across NCB, ED, Customs, and corporate fronts (JSM Pictures & Residency)."
-    ];
-
+    // 11. Default Master Case Intelligence Overview
     if (lang === "hi") {
+      reasoning = [
+        "जांच दायरा: प्रमुख मामला KRONOS-2024-001 (जाफर सादिक सिंडिकेट जांच)।",
+        "ट्रैकिंग: 50.070 किग्रा स्यूडोएफ़ेड्रिन, ₹55.30 करोड़ अटैच संपत्तियां, और 2015/2019 प्रेडिकेट मामले।"
+      ];
       answerText = `<b>क्रोनोस मास्टर इंटेलिजेंस — जाफर सादिक जांच (KRONOS-2024-001):</b><br>
 सिस्टम 50.070 किग्रा स्यूडोएफ़ेड्रिन जब्ती, ₹55.30 करोड़ की पीएमएलए संपत्ति कुर्की, 2015/2019 प्रेडिकेट कस्टम्स मामलों, और मद्रास हाईकोर्ट/सुप्रीम कोर्ट जमानत के संपूर्ण घटनाक्रम को ट्रैक कर रहा है।<br>
-आप '50kg जब्ती', '55 करोड़ अटैच संपत्ति', 'जमानत स्थिति', 'अग्रिम साक्ष्य सुझाव', या '3D ग्राफ' के बारे में पूछ सकते हैं।`;
+आप 'जाफर सादिक कार्टेल सारांश', '50kg जब्ती', '55 करोड़ अटैच संपत्ति', 'जमानत स्थिति', 'अग्रिम साक्ष्य सुझाव', या '3D ग्राफ' के बारे में पूछ सकते हैं।`;
     } else if (lang === "gu") {
+      reasoning = [
+        "તપાસ ક્ષેત્ર: મુખ્ય કેસ KRONOS-2024-001 (જાફર સાદિક સિન્ડિકેટ તપાસ).",
+        "ટ્રેકિંગ: 50.070 કિગ્રા સ્યુડોએફેડ્રિન, ₹55.30 કરોડ અટેચ મિલકતો, અને 2015/2019 પ્રિડિકેટ કેસો."
+      ];
       answerText = `<b>ક્રોનોસ માસ્ટર ઇન્ટેલિજન્સ — જાફર સાદિક તપાસ (KRONOS-2024-001):</b><br>
 સિસ્ટમ 50.070 કિગ્રા સ્યુડોએફેડ્રિન જપ્તી, ₹55.30 કરોડની PMLA મિલકત અટેચમેન્ટ, 2015/2019 પ્રિડિકેટ કસ્ટમ્સ કેસો, અને મદ્રાસ હાઈકોર્ટ/સુપ્રીમ કોર્ટ જામીન ઘટનાક્રમને ટ્રેક કરે છે.<br>
-તમે '50kg જપ્તી', '55 કરોડ અટેચ પ્રોપર્ટી', 'જામીન સ્થિતિ', 'Next Best Evidence લીડ્સ', અથવા '3D ગ્રાફ' વિશે પૂછી શકો છો.`;
+તમે 'જાફર સાદિક કાર્ટેલ સારાંશ', '50kg જપ્તી', '55 કરોડ અટેચ પ્રોપર્ટી', 'જામીન સ્થિતિ', 'Next Best Evidence લીડ્સ', અથવા '3D ગ્રાફ' વિશે પૂછી શકો છો.`;
     } else {
+      reasoning = [
+        "Scope: Featured Case KRONOS-2024-001 (Jaffer Sadiq Cartel Investigation).",
+        "Tracking: 50.070 kg pseudoephedrine seizure, ₹55.30 Cr asset attachment, and predicate dockets."
+      ];
       answerText = `<b>KRONOS Master Intelligence — Jaffer Sadiq Investigation (KRONOS-2024-001):</b><br>
 Tracking the complete investigative trajectory: 50.070 kg pseudoephedrine seizure (Basai Darapur, Feb 2024), ED PMLA asset attachment of ₹55.30 crore (Sept 2024), prosecution complaint against 20 accused (Nov 2024), earlier predicate customs dockets (2015 & 2019), and Madras High Court / Supreme Court bail decisions.<br>
-You can ask about "50kg seizure", "₹55.30 Cr attached assets", "predicate cases", "bail decisions", "next best evidence", or "open 3D graph".`;
+You can ask about "Summarise Jaffer Sadiq drug cartel investigation", "50kg seizure", "₹55.30 Cr attached assets", "predicate cases", "bail decisions", or "open 3D graph".`;
     }
 
     action = {
@@ -2414,7 +2494,7 @@ You can ask about "50kg seizure", "₹55.30 Cr attached assets", "predicate case
             <span>▾</span>
           </button>
           <div class="c-thought-body">
-            ${m.reasoning.map((r, i) => `<div class="c-thought-step"><b>Step ${i+1}:</b> ${r}</div>`).join("")}
+            ${m.reasoning.map((r, i) => `<div class="c-thought-step"><b>${l.stepPrefix || "Step"} ${i+1}:</b> ${r}</div>`).join("")}
           </div>
         </div>
       ` : "";
@@ -2447,8 +2527,31 @@ You can ask about "50kg seizure", "₹55.30 Cr attached assets", "predicate case
 
     // Language pills active state
     $$(".c-lang-btn").forEach(b => {
-      b.classList.toggle("on", b.dataset.l === cLang);
-    });
+    b.onclick = () => {
+      cLang = b.dataset.l;
+      localStorage.setItem("kr_copilot_lang", cLang);
+      
+      // Auto re-generate last bot response in the new language if query exists
+      for (let i = cHist.length - 1; i >= 0; i--) {
+        if (cHist[i].role === "user") {
+          const reQ = cHist[i].text;
+          const res = processCopilotQuery(reQ, cLang);
+          if (res) {
+            cHist[cHist.length - 1] = {
+              role: "bot",
+              text: res.answerText,
+              reasoning: res.reasoning,
+              action: res.action,
+              executed: res.executed
+            };
+          }
+          break;
+        }
+      }
+      renderCopilotUI();
+      updateContextBanner();
+    };
+  });
 
     // Suggested Chips
     const chipsEl = $("#c-chips");
