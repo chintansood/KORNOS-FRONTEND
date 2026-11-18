@@ -1777,6 +1777,97 @@ route();
     let reasoning = [];
     let action = null;
 
+    // A. Hardware Devices & IMEIs & Phone numbers
+    if (/device|hardware|imei|phone|handset|मोबाइल|डिवाइस|उपकरण|ફોન|ડિવાઇસ/.test(q)) {
+      reasoning = [
+        "Entity Resolution: Scanning hardware registers (IMEIs, Handsets, IP Devices, Phones).",
+        "Queried master entities across 6 primary suspect profiles in database.",
+        "Identified 6 hardware MAC/IMEI profiles and 11 registered phone numbers."
+      ];
+
+      const devList = PERS.map(p => `• <b>${p.n} (${p.id})</b>: ${p.dev} | Phones: <i>${p.ph}</i>`).join("<br>");
+
+      if (lang === "hi") {
+        answerText = `<b>सिंडिकेट हार्डवेयर एवं डिवाइस रजिस्ट्री (Devices & Hardware):</b><br>${devList}<br><br><b>फोरेंसिक स्थिति:</b> सभी डिवाइस सेलुलर टॉवर और वाई-फाई नोड्स से टैग हैं।`;
+      } else if (lang === "gu") {
+        answerText = `<b>સિન્ડિકેટ હાર્ડવેર અને ડિવાઇસ રજિસ્ટ્રી (Devices & Hardware):</b><br>${devList}<br><br><b>ફોરેન્સિક સ્થિતિ:</b> બધા ડિવાઇસ સેલ્યુલર ટાવર સાથે લિંક છે.`;
+      } else {
+        answerText = `<b>Hardware & Device Registry (Forensic Evidence):</b><br>${devList}<br><br><b>Investigation Status:</b> All devices cross-referenced with cellular tower pings and CDR handoffs.`;
+      }
+
+      action = {
+        type: "NAV",
+        target: "graph",
+        label: lang === "hi" ? "3D ग्राफ में डिवाइस नोड्स देखें" : lang === "gu" ? "3D ગ્રાફમાં ડિવાઇસ નોડ્સ જુઓ" : "Inspect Device Nodes in 3D Graph"
+      };
+
+      if (/open|show|go|view|खोलो|દિખાઓ|બતાવો/.test(q)) {
+        location.hash = "graph";
+        return { answerText, reasoning, action, executed: true };
+      }
+      return { answerText, reasoning, action, executed: false };
+    }
+
+    // B. Financial Accounts & Mule Streams
+    if (/account|bank|mule|transfer|rtgs|upi|खाता|बैंक|खाते|ખાતું|બેંક/.test(q)) {
+      reasoning = [
+        "Query Intent: Financial Forensics & Money Mule Network Audit.",
+        "Scanned accounts across 100 cases: HDFC, SBI, PNB, KOTAK, YESB, INDUS.",
+        "Identified primary corporate escrow drain (HDFC-00449102) and secondary mule tranches."
+      ];
+
+      const accList = [
+        "• <b>HDFC-00449102</b> (Rohan Mehta, P-0427) — Primary Corporate Escrow Drain",
+        "• <b>SBI-30299100</b> (Vikramjit Sethi, P-0299) — Mule Layer Pooling Account",
+        "• <b>PNB-44109201</b> (Harpreet Mann, P-0350) — Transit & Logistics Escrow",
+        "• <b>KOTAK-90118234</b> (Devendra Gill, P-0384) — Technical Proxy Liquidation",
+        "• <b>YESB-10928347</b> (Sandeep Verma, P-0120) — Secondary Layer-Two Sweep"
+      ].join("<br>");
+
+      if (lang === "hi") {
+        answerText = `<b>फोरेंसिक बैंक खाता एवं मनी म्यूल नेटवर्क (Accounts):</b><br>${accList}<br><br><b>सिंडिकेट पैटर्न:</b> त्वरित आरटीजीएस (RTGS) लेयरिंग से ट्रिगर सीमा से बचाव।`;
+      } else if (lang === "gu") {
+        answerText = `<b>ફોરેન્સિક બેંક એકાઉન્ટ અને મની મ્યુલ નેટવર્ક (Accounts):</b><br>${accList}<br><br><b>સિન્ડિકેટ પેટર્ન:</b> ઝડપી RTGS લેયરિંગ દ્વારા ઓટોમેટેડ એલર્ટ્સથી બચાવ.`;
+      } else {
+        answerText = `<b>Financial Accounts & Mule Layering Network:</b><br>${accList}<br><br><b>Syndicate Pattern:</b> Rapid RTGS tranches executed below AML automated threshold limits.`;
+      }
+
+      action = {
+        type: "NAV",
+        target: "graph",
+        label: lang === "hi" ? "3D ग्राफ में वित्तीय नोड्स देखें" : lang === "gu" ? "3D ગ્રાફમાં નાણાકીય નોડ્સ જુઓ" : "Inspect Accounts in 3D Graph"
+      };
+
+      if (/open|show|go|view|खोलो|બતાવો/.test(q)) {
+        location.hash = "graph";
+        return { answerText, reasoning, action, executed: true };
+      }
+      return { answerText, reasoning, action, executed: false };
+    }
+
+    // C. Specific Case Request (e.g. "case 14", "case 1", "case 017")
+    const matchedCase = CASES.find(c => q.includes(c.id.toLowerCase()) || q.includes(c.id.toLowerCase().replace("-", "")) || q.includes(c.id.toLowerCase().replace("case-", "case ")) || q.includes(c.id.toLowerCase().replace("case-0", "case ")));
+    if (matchedCase && /open|show|view|load|go|खोलो|દિખાઓ|બતાવો/.test(q)) {
+      action = {
+        type: "NAV",
+        target: "dash",
+        label: lang === "hi" ? `${matchedCase.id} का विवरण देखें` : lang === "gu" ? `${matchedCase.id} ની વિગતો જુઓ` : `Open ${matchedCase.id} in Dashboard`
+      };
+      reasoning = [
+        `Extracted Case Docket: ${matchedCase.id} (${matchedCase.t})`,
+        `Status: ${matchedCase.st} | Evidence: ${matchedCase.ev} items | People: ${matchedCase.ppl.join(", ")}`,
+        `Action Dispatched: Synchronized to Investigations Dashboard.`
+      ];
+      answerText = lang === "hi"
+        ? `<b>${matchedCase.id} (${matchedCase.t}):</b><br>• श्रेणी: ${matchedCase.cat}<br>• स्थिति: ${matchedCase.st}<br>• शामिल व्यक्ति: ${matchedCase.ppl.join(", ")}<br>डैशबोर्ड में लोड किया जा रहा है।`
+        : lang === "gu"
+        ? `<b>${matchedCase.id} (${matchedCase.t}):</b><br>• કેટેગરી: ${matchedCase.cat}<br>• સ્થિતિ: ${matchedCase.st}<br>• સંકળાયેલ વ્યક્તિઓ: ${matchedCase.ppl.join(", ")}<br>ડેશબોર્ડમાં લોડ થઈ રહ્યું છે.`
+        : `<b>${matchedCase.id} (${matchedCase.t}):</b><br>• Category: ${matchedCase.cat}<br>• Status: ${matchedCase.st} (${matchedCase.pr} Priority)<br>• Suspects: ${matchedCase.ppl.join(", ")}<br>• Evidence Count: ${matchedCase.ev} items.<br>Navigating to Dashboard.`;
+      
+      location.hash = "dash";
+      return { answerText, reasoning, action, executed: true };
+    }
+
     // 1. Check for Action Commands ("just write and that step is done")
     // Suspect Navigation
     const matchedSuspect = PERS.find(p => q.includes(p.id.toLowerCase()) || q.includes(p.n.toLowerCase().split(" ")[0]) || q.includes(p.n.toLowerCase().split(" ")[1] || ""));
